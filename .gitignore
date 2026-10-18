@@ -6,3 +6,5 @@ dist/
 artifacts/
 .recovery-npm-cache/
 recovery/
+__pycache__/
+*.pyc

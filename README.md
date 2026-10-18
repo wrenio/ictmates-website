@@ -42,7 +42,21 @@ The static website is generated in `dist/`. There is no application server or da
 
 The saved Windows SSH connection is `sg_ictmates`. The intended document root is `/home/customer/www/ictmates.com/public_html/`. The old WordPress installation has already been moved into `WP old website` as a backup and is outside this project's scope. Leave that backup untouched.
 
-No production files were changed during recovery. Deploy only when explicitly requested. The deployable output is the **contents** of `dist/`, also packaged as `artifacts/ictmates-siteground.zip`.
+No production files were changed during recovery. Automatic deployment from `main` is now configured as described below. The deployable output is the **contents** of `dist/`, also packaged locally as `artifacts/ictmates-siteground.zip`.
+
+### Automatic deployment
+
+Every push to `main` runs [Deploy website to SiteGround](https://github.com/wrenio/ictmates-website/actions/workflows/deploy-siteground.yml). It can also be rerun manually with **Run workflow** on `main`. No manual approval is required. Other branches do not deploy.
+
+The workflow runs deployment protection tests, installs the locked dependencies with `npm ci`, builds with Node.js 24, and packages only generated static files. Deployments are serialized so one release cannot interrupt another. Both public HTTPS homepages are checked against the release after SiteGround's dynamic cache is flushed.
+
+A dedicated key is stored in the GitHub `production` environment as `SITEGROUND_DEPLOY_KEY`, restricted to the `main` branch. The runner creates its own `sg_ictmates` SSH alias and verifies the pinned ED25519 host key in `ops/siteground_known_hosts`. Your Windows personal key is not stored in GitHub.
+
+On SiteGround, the key is restricted to `/home/customer/.ictmates-deploy/deploy_receiver.py`; it cannot run arbitrary shell commands or forward connections. The receiver rejects protected paths, hidden paths, traversal, symlinks, and executable server-side files. It publishes assets before `index.html`, retains older hashed assets, and never recursively synchronizes or deletes website directories. `WP old website`, `.well-known`, and unrelated files are preserved. Before/after metadata checks cover the protected directories.
+
+The installed receiver must match `ops/deploy_receiver.py` in the checkout; the workflow fails safely if these differ. A receiver update requires installing the reviewed script using the owner's existing SSH connection. Previous overwritten static files and deployment receipts are retained outside the web root under `/home/customer/.ictmates-deploy/releases/`.
+
+To revoke automatic SSH access, remove only the `ictmates-github-actions` key line from SiteGround's `/home/customer/.ssh/authorized_keys2` and remove the GitHub environment secret. Preserve the other registered keys. To pause automatic deployment without changing keys, disable this workflow in GitHub Actions.
 
 Before launch, inventory the existing WordPress URLs and configure redirects for any pages being replaced. The current implementation is a single marketing page, not a migration of the existing blog or portfolio. Confirm the displayed phone number, commercial terms, domain-registration offer and demo destination. The WC demo is a temporary test site and should be updated when its production destination is available.
 

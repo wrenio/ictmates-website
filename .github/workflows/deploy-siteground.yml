@@ -1,0 +1,90 @@
+name: Deploy website to SiteGround
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ictmates-siteground-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://ictmates.com
+    env:
+      ASTRO_TELEMETRY_DISABLED: '1'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Test deployment protections
+        run: python3 -m unittest discover -s tests -v
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Build static website
+        run: npm run build
+      - name: Package release
+        run: python3 ops/build_release.py --commit "$GITHUB_SHA" --output "$RUNNER_TEMP/ictmates-release.zip"
+      - name: Deploy through restricted SSH key
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.SITEGROUND_DEPLOY_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$DEPLOY_SSH_KEY"
+          umask 077
+          key="$RUNNER_TEMP/ictmates-siteground-key"
+          config="$RUNNER_TEMP/ictmates-ssh-config"
+          trap 'rm -f "$key" "$config"' EXIT
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$key"
+          cat > "$config" <<EOF
+          Host sg_ictmates
+              HostName ams17.siteground.eu
+              User u1211-yhjqvpyaiqyu
+              Port 18765
+              IdentityFile $key
+              IdentitiesOnly yes
+              BatchMode yes
+              StrictHostKeyChecking yes
+              HostKeyAlgorithms ssh-ed25519
+              UserKnownHostsFile $GITHUB_WORKSPACE/ops/siteground_known_hosts
+              UpdateHostKeys no
+              ConnectTimeout 30
+              ServerAliveInterval 15
+              ServerAliveCountMax 4
+          EOF
+          ssh -F "$config" sg_ictmates status > "$RUNNER_TEMP/receiver-status.json"
+          python3 - "$RUNNER_TEMP/receiver-status.json" <<'PY'
+          import hashlib, json, sys
+          from pathlib import Path
+          status = json.load(open(sys.argv[1]))
+          expected = hashlib.sha256(Path('ops/deploy_receiver.py').read_bytes()).hexdigest()
+          if not status.get('ready') or status.get('receiver_sha256') != expected:
+              raise SystemExit('Installed deployment receiver does not match this checkout')
+          print('Pinned SSH host key and installed receiver verified.')
+          PY
+          ssh -F "$config" sg_ictmates deploy < "$RUNNER_TEMP/ictmates-release.zip" | tee "$RUNNER_TEMP/deployment-result.json"
+          python3 - "$RUNNER_TEMP/deployment-result.json" >> "$GITHUB_STEP_SUMMARY" <<'PY'
+          import json, sys
+          result = json.load(open(sys.argv[1]))
+          print('## Deployed to SiteGround')
+          print('Commit: `' + result['commit'] + '`')
+          print('\nProtected backup folders unchanged: ' + str(result['protected_unchanged']))
+          for check in result['https']:
+              print('\n- ' + check['url'] + ' — HTTP 200, matches release')
+          PY

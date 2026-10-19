@@ -65,7 +65,7 @@ Before launch, inventory the existing WordPress URLs and configure redirects for
 - Edit copy and pricing in `src/pages/index.astro`.
 - Edit the visual design in `src/styles/global.css`.
 - Pricing buttons lead to the contact section and identify the selected plan.
-- The contact button opens a telephone call. No form submission or checkout is implemented.
+- The contact button opens WhatsApp for +92 300 555 1575 in a new tab. Pricing buttons prefill the selected plan in the WhatsApp message. No message is sent automatically, and no form submission or checkout is implemented.
 - The storefront in the hero is an original CSS illustration, not a screenshot or promise of a specific theme.
 - No subscription is purchased and no seller account is created on this marketing site.
 

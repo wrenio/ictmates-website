@@ -36,7 +36,7 @@ const faqs = [
     <header class="header wrap">
       <a class="logo" href="#" aria-label="ICTmates home"><img src="/ictmates-logo.png" alt="ICT Mates" width="1000" height="333" /></a>
       <nav aria-label="Main navigation">
-        <a href="#webshops">Webshops</a><a href="#pricing">Pricing</a><a href="#services">IT services</a><a href="#about">About us</a>
+        <a href="#webshops">Webshops</a><a href="/why-wrenio/">Why Wrenio?</a><a href="#pricing">Pricing</a><a href="#services">IT services</a><a href="#about">About us</a>
       </nav>
       <a class="button small" href="#contact">Let’s talk <span aria-hidden="true">↗︎</span></a>
     </header>
@@ -88,7 +88,7 @@ const faqs = [
       <section class="section wrap faq" id="faq"><div><div class="eyebrow">A FEW THINGS YOU MIGHT ASK</div><h2>Let’s make<br /><em>it clear.</em></h2><p>Something else on your mind?<br /><a href="#contact" class="text-link">Talk to our team ↗︎</a></p></div><div class="faq-list">{faqs.map(([q,a])=><details><summary>{q}<span aria-hidden="true">+</span></summary><p>{a}</p></details>)}</div></section>
       <section class="contact wrap" id="contact"><div><div class="eyebrow">LET’S GET YOUR BUSINESS ONLINE</div><h2>Your shop’s next<br />chapter starts here.</h2><p>Tell us what you sell and what you have in mind. We’ll walk you through Wrenio Commerce and the next steps.</p></div><div class="contact-actions"><a class="button lime" id="contact-whatsapp" href="https://wa.me/923005551575" target="_blank" rel="noopener noreferrer">Chat with us on WhatsApp ↗︎</a><a class="contact-number" href="https://wa.me/923005551575" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp at +92 300 555 1575">+92 300 555 1575</a><p id="plan-interest" aria-live="polite">Tell us about your project, ask a question, or discuss any of our services.</p><span>Building 13, Block J, Gulberg III<br />Lahore, Pakistan</span></div></section>
     </main>
-    <footer class="wrap footer"><a class="logo" href="#"><img src="/ictmates-logo.png" alt="ICT Mates" width="1000" height="333" loading="lazy" /></a><p>Technology for your next chapter.</p><nav aria-label="Footer navigation"><a href="#pricing">Pricing</a><a href="#services">Services</a><a href="#faq">FAQs</a><a href="#contact">Contact</a></nav><div class="footer-bottom"><span>© {new Date().getFullYear()} ICTmates. All rights reserved.</span><span>Wrenio Commerce · Built by ICTmates in Pakistan</span></div></footer>
+    <footer class="wrap footer"><a class="logo" href="#"><img src="/ictmates-logo.png" alt="ICT Mates" width="1000" height="333" loading="lazy" /></a><p>Technology for your next chapter.</p><nav aria-label="Footer navigation"><a href="/why-wrenio/">Why Wrenio?</a><a href="#pricing">Pricing</a><a href="#services">Services</a><a href="#faq">FAQs</a><a href="#contact">Contact</a></nav><div class="footer-bottom"><span>© {new Date().getFullYear()} ICTmates. All rights reserved.</span><span>Wrenio Commerce · Built by ICTmates in Pakistan</span></div></footer>
     <script>
       document.querySelectorAll<HTMLAnchorElement>('[data-plan]').forEach(link => {
         link.addEventListener('click', () => {

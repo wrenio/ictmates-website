@@ -63,6 +63,8 @@ Before launch, inventory the existing WordPress URLs and configure redirects for
 ## Content and interactions
 
 - Edit copy and pricing in `src/pages/index.astro`.
+- The customer comparison page is `src/pages/why-wrenio.astro`, published at `/why-wrenio/` and linked from the homepage navigation and footer.
+- The one-page A4 customer flyer is served from `public/downloads/wrenio-commerce-flyer.pdf`. Keep its offer and comparison assumptions aligned with the comparison page.
 - Edit the visual design in `src/styles/global.css`.
 - Pricing buttons lead to the contact section and identify the selected plan.
 - The contact button opens WhatsApp for +92 300 555 1575 in a new tab. Pricing buttons prefill the selected plan in the WhatsApp message. No message is sent automatically, and no form submission or checkout is implemented.

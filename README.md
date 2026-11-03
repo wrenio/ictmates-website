@@ -52,7 +52,7 @@ The workflow runs deployment protection tests, installs the locked dependencies 
 
 ### Cloudflare and SiteGround caching
 
-The Cloudflare rule `ICTmates public marketing pages` is limited to HTTPS GET/HEAD requests for `/`, `/index.html`, `/why-wrenio`, `/why-wrenio/` and `/why-wrenio/index.html` on `ictmates.com` and `www.ictmates.com`. Requests with cookies or query strings, and the receiver's exact `ICTMates-Deployment-Verification/1.0` user agent, do not match. The verification exception lets the receiver check fresh origin content before the subsequent Cloudflare purge; it grants no access to private content.
+The Cloudflare rule `ICTmates public marketing pages` is limited to HTTPS requests for `/`, `/index.html`, `/why-wrenio`, `/why-wrenio/` and `/why-wrenio/index.html` on `ictmates.com` and `www.ictmates.com`. Requests with cookies or query strings, and the receiver's exact `ICTMates-Deployment-Verification/1.0` user agent, do not match. The verification exception lets the receiver check fresh origin content before the subsequent Cloudflare purge; it grants no access to private content. Do not add an HTTP-method filter to this rule: Cloudflare URL purges use an internal method, so a GET/HEAD-only expression can leave stale HTML cached even when the purge API reports success. Cloudflare itself only caches eligible read requests.
 
 The rule uses a two-hour edge TTL, bypasses browser caching for HTML, and does not store HTTP responses with status 400 or higher. Fonts and hashed CSS use normal static-asset caching; version font filenames when replacing their contents. The rule does not apply to the old WordPress backup, `.well-known`, other paths or other subdomains.
 

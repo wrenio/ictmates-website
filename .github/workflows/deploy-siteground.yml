@@ -116,8 +116,10 @@ jobs:
               for route, file in (('/', 'index.html'), ('/why-wrenio/', 'why-wrenio/index.html')):
                   url = 'https://' + host + route
                   expected = hashlib.sha256((Path('dist') / file).read_bytes()).digest()
+                  public_request = urllib.request.Request(url, headers={
+                      'User-Agent': 'ICTMates-Public-Verification/1.0'})
                   for attempt in range(5):
-                      with urllib.request.urlopen(url, timeout=20) as response:
+                      with urllib.request.urlopen(public_request, timeout=20) as response:
                           matches = response.status == 200 and hashlib.sha256(response.read()).digest() == expected
                       if matches:
                           print(url + ' — HTTP 200, matches release after Cloudflare purge')

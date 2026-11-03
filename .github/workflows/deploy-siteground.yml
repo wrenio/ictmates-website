@@ -120,7 +120,16 @@ jobs:
                       'User-Agent': 'ICTMates-Public-Verification/1.0'})
                   for attempt in range(5):
                       with urllib.request.urlopen(public_request, timeout=20) as response:
-                          matches = response.status == 200 and hashlib.sha256(response.read()).digest() == expected
+                          body = response.read()
+                          actual = hashlib.sha256(body).digest()
+                          matches = response.status == 200 and actual == expected
+                          if not matches and attempt in (0, 4):
+                              print('Public check mismatch:', url, 'bytes=', len(body),
+                                    'cache=', response.headers.get('CF-Cache-Status'),
+                                    'ray=', response.headers.get('CF-Ray'),
+                                    'expected=', expected.hex(), 'actual=', actual.hex(),
+                                    'challenge=', b'/cdn-cgi/challenge-platform/' in body,
+                                    'local_fonts=', b'/fonts/dm-sans-latin-v17.woff2' in body)
                       if matches:
                           print(url + ' — HTTP 200, matches release after Cloudflare purge')
                           break

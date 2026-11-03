@@ -97,7 +97,7 @@ jobs:
           CLOUDFLARE_CACHE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_CACHE_PURGE_TOKEN }}
         run: |
           python3 - <<'PY'
-          import hashlib, json, os, time, urllib.request
+          import difflib, hashlib, json, os, time, urllib.request
           from pathlib import Path
 
           hosts = ('ictmates.com', 'www.ictmates.com')
@@ -130,6 +130,11 @@ jobs:
                                     'expected=', expected.hex(), 'actual=', actual.hex(),
                                     'challenge=', b'/cdn-cgi/challenge-platform/' in body,
                                     'local_fonts=', b'/fonts/dm-sans-latin-v17.woff2' in body)
+                              if attempt == 0:
+                                  source = (Path('dist') / file).read_bytes()
+                                  for op, a, b, c, d in difflib.SequenceMatcher(None, source, body, autojunk=False).get_opcodes():
+                                      if op != 'equal':
+                                          print('HTML difference:', op, repr(source[a:b][:500]), repr(body[c:d][:500]))
                       if matches:
                           print(url + ' — HTTP 200, matches release after Cloudflare purge')
                           break

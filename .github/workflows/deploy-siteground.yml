@@ -40,6 +40,10 @@ jobs:
         run: npm run build
       - name: Package release
         run: python3 ops/build_release.py --commit "$GITHUB_SHA" --output "$RUNNER_TEMP/ictmates-release.zip"
+      - name: Check Cloudflare purge configuration
+        env:
+          CLOUDFLARE_CACHE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_CACHE_PURGE_TOKEN }}
+        run: test -n "$CLOUDFLARE_CACHE_PURGE_TOKEN"
       - name: Deploy through restricted SSH key
         env:
           DEPLOY_SSH_KEY: ${{ secrets.SITEGROUND_DEPLOY_KEY }}
@@ -87,4 +91,38 @@ jobs:
           print('\nProtected backup folders unchanged: ' + str(result['protected_unchanged']))
           for check in result['https']:
               print('\n- ' + check['url'] + ' — HTTP 200, matches release')
+          PY
+      - name: Refresh Cloudflare cache and verify public pages
+        env:
+          CLOUDFLARE_CACHE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_CACHE_PURGE_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, time, urllib.request
+          from pathlib import Path
+
+          hosts = ('ictmates.com', 'www.ictmates.com')
+          paths = ('/', '/index.html', '/why-wrenio', '/why-wrenio/', '/why-wrenio/index.html')
+          urls = ['https://' + host + path for host in hosts for path in paths]
+          request = urllib.request.Request(
+              'https://api.cloudflare.com/client/v4/zones/b69ed4c08749b8d5a820fd2f96206ff3/purge_cache',
+              data=json.dumps({'files': urls}).encode(), method='POST',
+              headers={'Authorization': 'Bearer ' + os.environ['CLOUDFLARE_CACHE_PURGE_TOKEN'],
+                       'Content-Type': 'application/json'})
+          with urllib.request.urlopen(request, timeout=30) as response:
+              result = json.load(response)
+          if result.get('success') is not True:
+              raise SystemExit('Cloudflare cache purge failed')
+          for host in hosts:
+              for route, file in (('/', 'index.html'), ('/why-wrenio/', 'why-wrenio/index.html')):
+                  url = 'https://' + host + route
+                  expected = hashlib.sha256((Path('dist') / file).read_bytes()).digest()
+                  for attempt in range(5):
+                      with urllib.request.urlopen(url, timeout=20) as response:
+                          matches = response.status == 200 and hashlib.sha256(response.read()).digest() == expected
+                      if matches:
+                          print(url + ' — HTTP 200, matches release after Cloudflare purge')
+                          break
+                      if attempt == 4:
+                          raise SystemExit('Public page does not match release after Cloudflare purge: ' + url)
+                      time.sleep(3)
           PY

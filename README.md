@@ -36,7 +36,7 @@ npm run build
 npm run preview
 ```
 
-The static website is generated in `dist/`. There is no application server or database required for deployment. Google Fonts is used for typography, with local system fallbacks.
+The static website is generated in `dist/`. There is no application server or database required for deployment. DM Sans and Manrope are served locally as variable WOFF2 fonts from `public/fonts/`, with early preloads and system fallbacks while loading. The Latin subsets retain the site's existing font weights; their SIL Open Font License files are included alongside them. No Google Fonts requests are needed at runtime.
 
 ## SiteGround deployment
 
@@ -48,7 +48,19 @@ No production files were changed during recovery. Automatic deployment from `mai
 
 Every push to `main` runs [Deploy website to SiteGround](https://github.com/wrenio/ictmates-website/actions/workflows/deploy-siteground.yml). It can also be rerun manually with **Run workflow** on `main`. No manual approval is required. Other branches do not deploy.
 
-The workflow runs deployment protection tests, installs the locked dependencies with `npm ci`, builds with Node.js 24, and packages only generated static files. Deployments are serialized so one release cannot interrupt another. Both public HTTPS homepages are checked against the release after SiteGround's dynamic cache is flushed.
+The workflow runs deployment protection tests, installs the locked dependencies with `npm ci`, builds with Node.js 24, and packages only generated static files. Deployments are serialized so one release cannot interrupt another. The receiver flushes SiteGround's dynamic cache and verifies both HTTPS homepages. The workflow then purges the public HTML URLs from Cloudflare and verifies both pages on both hostnames against the build.
+
+### Cloudflare and SiteGround caching
+
+The Cloudflare rule `ICTmates public marketing pages` is limited to HTTPS GET/HEAD requests for `/`, `/index.html`, `/why-wrenio`, `/why-wrenio/` and `/why-wrenio/index.html` on `ictmates.com` and `www.ictmates.com`. Requests with cookies or query strings, and the receiver's exact `ICTMates-Deployment-Verification/1.0` user agent, do not match. The verification exception lets the receiver check fresh origin content before the subsequent Cloudflare purge; it grants no access to private content.
+
+The rule uses a two-hour edge TTL, bypasses browser caching for HTML, and does not store HTTP responses with status 400 or higher. Fonts and hashed CSS use normal static-asset caching; version font filenames when replacing their contents. The rule does not apply to the old WordPress backup, `.well-known`, other paths or other subdomains.
+
+The GitHub `production` environment requires `CLOUDFLARE_CACHE_PURGE_TOKEN`, with only **Zone > Cache Purge > Purge** permission for **ictmates.com**. The workflow checks that the secret exists before publishing. Its purge targets only the listed HTML URLs on both hostnames, not the entire zone. A failed purge or mismatching public page fails the release workflow; do not report the release as verified until it succeeds.
+
+The two cache layers can coexist. The important order is **publish files → flush SiteGround → verify origin → purge Cloudflare → verify public pages**. Purging only SiteGround leaves Cloudflare's previous HTML intact; purging Cloudflare first can refill it from stale SiteGround content. Do not enable a second CDN or disable SiteGround caching for this static site. If a manual cache refresh is necessary, use Site Tools > Speed > Caching > Dynamic Cache first, then Cloudflare > Caching > Configuration > Custom Purge for the affected URLs on both hostnames.
+
+### Deployment access
 
 A dedicated key is stored in the GitHub `production` environment as `SITEGROUND_DEPLOY_KEY`, restricted to the `main` branch. The runner creates its own `sg_ictmates` SSH alias and verifies the pinned ED25519 host key in `ops/siteground_known_hosts`. Your Windows personal key is not stored in GitHub.
 

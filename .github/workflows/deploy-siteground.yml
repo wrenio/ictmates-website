@@ -97,8 +97,15 @@ jobs:
           CLOUDFLARE_CACHE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_CACHE_PURGE_TOKEN }}
         run: |
           python3 - <<'PY'
-          import difflib, hashlib, json, os, time, urllib.request
+          import hashlib, json, os, re, time, urllib.request
           from pathlib import Path
+
+          # Cloudflare Web Analytics may inject this beacon outside the EU.
+          # Ignore only that known external script; all other HTML must match.
+          beacon = re.compile(
+              rb'<script type="module" src="https://static\.cloudflareinsights\.com/beacon\.min\.js/[A-Za-z0-9]+" '
+              rb'integrity="sha512-[A-Za-z0-9+/=]+" '
+              rb'data-cf-beacon=\'[^\'<>]+\' crossorigin="anonymous"></script>\n(?=</body>)')
 
           hosts = ('ictmates.com', 'www.ictmates.com')
           paths = ('/', '/index.html', '/why-wrenio', '/why-wrenio/', '/why-wrenio/index.html')
@@ -121,7 +128,7 @@ jobs:
                   for attempt in range(5):
                       with urllib.request.urlopen(public_request, timeout=20) as response:
                           body = response.read()
-                          actual = hashlib.sha256(body).digest()
+                          actual = hashlib.sha256(beacon.sub(b'', body, count=1)).digest()
                           matches = response.status == 200 and actual == expected
                           if not matches and attempt in (0, 4):
                               print('Public check mismatch:', url, 'bytes=', len(body),
@@ -130,11 +137,6 @@ jobs:
                                     'expected=', expected.hex(), 'actual=', actual.hex(),
                                     'challenge=', b'/cdn-cgi/challenge-platform/' in body,
                                     'local_fonts=', b'/fonts/dm-sans-latin-v17.woff2' in body)
-                              if attempt == 0:
-                                  source = (Path('dist') / file).read_bytes()
-                                  for op, a, b, c, d in difflib.SequenceMatcher(None, source, body, autojunk=False).get_opcodes():
-                                      if op != 'equal':
-                                          print('HTML difference:', op, repr(source[a:b][:500]), repr(body[c:d][:500]))
                       if matches:
                           print(url + ' — HTTP 200, matches release after Cloudflare purge')
                           break

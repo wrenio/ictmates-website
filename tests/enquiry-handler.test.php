@@ -12,7 +12,7 @@ $sent = []; $verified = 0;
 $verify = function ($token) use (&$verified) { $verified++; return ['success' => $token === 'valid', 'hostname' => 'webstore.pk', 'action' => 'store']; };
 $send = function (...$mail) use (&$sent) { $sent[] = $mail; };
 $run = fn($data, $headers = null, $verification = null, $quota = null) => process_enquiry($headers ?? $server,
-    is_array($data) ? json_encode($data) : $data, $verification ?? $verify, $quota ?? fn() => true, $send);
+    is_array($data) ? json_encode($data) : $data, $verification ?? $verify, $quota ?? fn() => 'ok', $send);
 check($run($valid)[0] === 200 && count($sent) === 1, 'Valid enquiry accepted');
 check($sent[0][2] === '' && str_contains($sent[0][1], 'Rs. 30,000/year'), 'Optional email and selected plan preserved');
 $sent = [];
@@ -42,9 +42,13 @@ check($run($partner, null, fn() => ['success' => true, 'hostname' => 'www.websto
 check($sent[1][2] === 'visitor@example.com' && str_contains($sent[1][0], 'Affiliate'), 'Partner role and Reply-To preserved');
 $quotaFile = tempnam(sys_get_temp_dir(), 'webstore-quota-');
 try {
-    for ($i = 0; $i < 100; $i++) check(reserve_enquiry_quota($quotaFile), 'Quota allows normal traffic');
-    check(!reserve_enquiry_quota($quotaFile), 'Quota rejects excess');
+    check($run($valid, null, null, fn($token) => reserve_enquiry_quota($quotaFile, $token))[0] === 200, 'First server reservation accepted');
+    $countBeforeReplay = count($sent);
+    check($run($valid, null, null, fn($token) => reserve_enquiry_quota($quotaFile, $token))[0] === 400, 'Replay blocked even if provider accepts it again');
+    check(count($sent) === $countBeforeReplay, 'Replay never reaches SMTP');
+    for ($i = 1; $i < 100; $i++) check(reserve_enquiry_quota($quotaFile, 'token-' . $i) === 'ok', 'Quota allows normal traffic');
+    check(reserve_enquiry_quota($quotaFile, 'extra') === 'limited', 'Quota rejects excess');
     file_put_contents($quotaFile, json_encode([time() - 3601]));
-    check(reserve_enquiry_quota($quotaFile), 'Old quota entries expire');
+    check(reserve_enquiry_quota($quotaFile, 'fresh') === 'ok', 'Old quota entries expire');
 } finally { unlink($quotaFile); }
 echo "Enquiry handler: validation, provider rejection, replay rejection, fixed content and quota checks passed.\n";

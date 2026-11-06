@@ -47,9 +47,10 @@ WhatsApp preparation; opening WhatsApp never sends a message automatically.
 Cloudflare Turnstile is verified directly through Siteverify before sending mail.
 The handler rejects missing, invalid, expired and previously consumed tokens, checks
 the production hostname and form-specific action, validates fields and enforces a
-server-side honeypot. A locked rolling quota caps verified email attempts at 100 per
-hour across both forms. SMTP and verification failures fail closed, retain browser
-inputs and offer WhatsApp. Quota state contains timestamps only; this site does not
+server-side honeypot. A locked record of used token hashes prevents a token from
+sending twice, even if the provider accepts it again. The same record caps verified
+email attempts at 100 per hour across both forms. SMTP and verification failures fail closed, retain browser
+inputs and offer WhatsApp. Quota state contains timestamps and one-way token hashes only; this site does not
 save enquiry content to disk.
 
 Local configuration in ignored `webstore/.env.local`:

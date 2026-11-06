@@ -56,7 +56,9 @@ function process_enquiry(array $server, string $raw, callable $verify, callable 
         ($check['action'] ?? '') !== $kind) {
         return enquiry_result(400, 'Verification failed or expired. Please try again.');
     }
-    if (!$quota()) return enquiry_result(429, 'Please try again later or contact us on WhatsApp.');
+    $reservation = $quota($fields['token']);
+    if ($reservation === 'duplicate') return enquiry_result(400, 'This verification has already been used. Please verify again.');
+    if ($reservation !== 'ok') return enquiry_result(429, 'Please try again later or contact us on WhatsApp.');
     $subject = $kind === 'store' ? 'Webstore.pk webshop enquiry' : 'Webstore.pk partner enquiry — ' . ucfirst($fields['partner_type']);
     $body = $subject . "\n\nName: {$fields['name']}\nBusiness / creator: {$fields['business']}\nCity: {$fields['city']}\nPhone: {$fields['phone']}\n";
     if ($fields['email'] !== '') $body .= "Email: {$fields['email']}\n";
@@ -80,10 +82,11 @@ function verify_enquiry_token(string $token, string $secret): array
     return is_array($result) ? $result : [];
 }
 
-function reserve_enquiry_quota(string $path): bool
+function reserve_enquiry_quota(string $path, string $token): string
 {
     // Global SMTP cap: at most 100 verified enquiries per rolling hour, across both forms.
-    // Count before SMTP, under a lock, so simultaneous requests cannot exceed the cap.
+    // Reserve each token hash before SMTP, under a lock. This prevents duplicate
+    // delivery independently of the verification provider, including concurrent requests.
     $file = fopen($path, 'c+');
     if ($file === false || !flock($file, LOCK_EX)) throw new RuntimeException('Quota unavailable');
     try {
@@ -91,14 +94,21 @@ function reserve_enquiry_quota(string $path): bool
         $previous = $text === '' ? [] : json_decode($text, true);
         if (!is_array($previous)) throw new RuntimeException('Invalid quota state');
         $now = time();
-        $times = array_values(array_filter($previous, fn($time) => is_int($time) && $time > $now - 3600));
-        if (count($times) >= 100) return false;
-        $times[] = $now;
+        // Preserve counts from the timestamp-only state written by the first release.
+        $records = array_map(fn($entry) => is_int($entry) ? ['time' => $entry, 'hash' => ''] : $entry, $previous);
+        $times = array_values(array_filter($records, fn($entry) => is_array($entry) &&
+            is_int($entry['time'] ?? null) && $entry['time'] > $now - 3600));
+        $hash = hash('sha256', $token);
+        foreach ($times as $entry) {
+            if (($entry['hash'] ?? '') === $hash) return 'duplicate';
+        }
+        if (count($times) >= 100) return 'limited';
+        $times[] = ['time' => $now, 'hash' => $hash];
         rewind($file);
         if (!ftruncate($file, 0) || fwrite($file, json_encode($times)) === false || !fflush($file)) {
             throw new RuntimeException('Quota write failed');
         }
-        return true;
+        return 'ok';
     } finally {
         flock($file, LOCK_UN);
         fclose($file);
@@ -125,7 +135,7 @@ try {
         require_once __DIR__ . '/mail/SMTP.php';
         [$status, $result] = process_enquiry($_SERVER, file_get_contents('php://input', false, null, 0, 16385),
             fn($token) => verify_enquiry_token($token, $config['turnstile_secret']),
-            fn() => reserve_enquiry_quota($private . '/quota.json'),
+            fn($token) => reserve_enquiry_quota($private . '/quota.json', $token),
             function ($subject, $body, $replyEmail, $replyName) use ($config) {
                 $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
                 $mail->isSMTP();

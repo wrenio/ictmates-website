@@ -22,7 +22,7 @@ jobs:
       url: https://webstore.pk
     env:
       ASTRO_TELEMETRY_DISABLED: '1'
-      PUBLIC_WEB3FORMS_ACCESS_KEY: ${{ secrets.PUBLIC_WEB3FORMS_ACCESS_KEY }}
+      PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.PUBLIC_TURNSTILE_SITE_KEY }}
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -37,14 +37,16 @@ jobs:
         run: python3 -m unittest discover -s tests -v
       - name: Test enquiry delivery protections
         run: node --test tests/enquiry-email.test.mjs
+      - name: Test server-side enquiry protections
+        run: php tests/enquiry-handler.test.php
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
       - name: Check form configuration
-        run: test -n "$PUBLIC_WEB3FORMS_ACCESS_KEY"
+        run: test -n "$PUBLIC_TURNSTILE_SITE_KEY"
       - name: Build static website
         run: npm run build:webstore
       - name: Package release
-        run: python3 ops/build_release.py --dist webstore/dist --commit "$GITHUB_SHA" --output "$RUNNER_TEMP/webstore-release.zip"
+        run: python3 ops/build_release.py --webstore --dist webstore/dist --commit "$GITHUB_SHA" --output "$RUNNER_TEMP/webstore-release.zip"
       - name: Deploy through restricted SSH key
         env:
           DEPLOY_SSH_KEY: ${{ secrets.SITEGROUND_DEPLOY_KEY }}
@@ -96,7 +98,7 @@ jobs:
       - name: Verify public pages and assets
         run: |
           python3 - <<'PY'
-          import re, urllib.request
+          import re, urllib.request, urllib.error, json
           from pathlib import Path
           # HTML bypasses Cloudflare caching; hashed assets use normal edge caching.
           # Ignore only the recognized Cloudflare analytics script, which can vary by region.
@@ -107,7 +109,7 @@ jobs:
           root = Path('webstore/dist')
           for host in ('webstore.pk', 'www.webstore.pk'):
               for file in sorted(root.rglob('*')):
-                  if not file.is_file() or file.suffix == '.txt':
+                  if not file.is_file() or file.suffix in ('.txt', '.php'):
                       continue
                   path = file.relative_to(root).as_posix()
                   route = path[:-10] if path.endswith('index.html') else path
@@ -117,4 +119,11 @@ jobs:
                       if response.status != 200 or beacon.sub(b'', response.read(), count=1) != file.read_bytes():
                           raise SystemExit('Public file differs from release: ' + path)
                   print(host + '/' + route + ' matches release')
+              try:
+                  urllib.request.urlopen('https://' + host + '/api/enquiry.php', timeout=30)
+                  raise SystemExit('Enquiry endpoint must reject GET')
+              except urllib.error.HTTPError as error:
+                  if error.code != 405 or json.load(error).get('success') is not False:
+                      raise SystemExit('Enquiry endpoint is not running correctly')
+              print(host + '/api/enquiry.php rejects GET; source hashes checked by receiver')
           PY

@@ -26,6 +26,8 @@ MAX_EXPANDED = 128 * 1024 * 1024
 EXTENSIONS = {'.html', '.css', '.js', '.mjs', '.json', '.svg', '.png', '.jpg',
               '.jpeg', '.gif', '.webp', '.avif', '.ico', '.txt', '.xml', '.woff',
               '.woff2', '.ttf', '.otf', '.map', '.pdf'}
+FORM_FILES = frozenset({'api/enquiry.php', 'api/mail/Exception.php',
+                        'api/mail/PHPMailer.php', 'api/mail/SMTP.php'})
 
 def require(condition, message):
     if not condition:
@@ -43,7 +45,8 @@ def safe_name(name):
             'Hidden or traversing release path')
     require(path.parts[0].casefold() not in {p.casefold() for p in PROTECTED},
             'Protected backup path')
-    require(path.suffix.lower() in EXTENSIONS, 'Only static files are permitted')
+    require(path.suffix.lower() in EXTENSIONS or name in FORM_FILES,
+            'Only static files and the exact enquiry handler files are permitted')
     return path
 
 def read_package(payload):

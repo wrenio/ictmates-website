@@ -10,6 +10,12 @@ from ops import deploy_webstore_receiver as receiver
 class WebstoreReadPackageTests(shared.ReadPackageTests):
     receiver = receiver
 
+    def test_allows_only_exact_form_php_files(self):
+        for name in receiver.FORM_FILES:
+            self.receiver.read_package(shared.package_bytes({'index.html': b'home', name: b'<?php'}))
+        for name in ('evil.php', 'api/config.php', 'api/enquiry.PHP', 'other/api/enquiry.php', 'api/mail/other.php'):
+            self.assert_rejected(shared.package_bytes({'index.html': b'home', name: b'<?php'}))
+
 
 class WebstoreSafeTargetTests(shared.SafeTargetTests):
     receiver = receiver

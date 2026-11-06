@@ -39,62 +39,83 @@ project root in PowerShell, set `$env:ASTRO_TELEMETRY_DISABLED = '1'`, then run
 `npm run build:webstore` generates `webstore/dist/`; `npm run preview:webstore`
 serves that build. The existing ICTmates build and deployment remain separate.
 
-The `/partners/` page includes required name, business/creator, city, phone and partner-type fields, plus optional email, in its
-enquiry form. Visitors can send an email through Web3Forms with hCaptcha or prepare
-a WhatsApp message to review before opening WhatsApp. Editing fields clears the
-prepared link. This site does not store enquiries; Web3Forms handles email delivery.
+The homepage and `/partners/` forms send enquiries to `azeem@ictmates.com` through
+`/api/enquiry.php`, using authenticated SiteGround SMTP from `website@webstore.pk`.
+The visitor's optional email is used only as Reply-To. Both forms retain independent
+WhatsApp preparation; opening WhatsApp never sends a message automatically.
 
-Both forms share a Web3Forms access key delivering to `azeem@ictmates.com`.
-The email subject identifies store versus partner enquiries. In the Web3Forms
-form settings, **hCaptcha must be selected and saved under Captcha Protection**
-to require verification on the server. The free integration uses Web3Forms'
-public hCaptcha site key; no private captcha secret is put in the website.
-The offscreen `website` honeypot also blocks filled submissions in the client.
+Cloudflare Turnstile is verified directly through Siteverify before sending mail.
+The handler rejects missing, invalid, expired and previously consumed tokens, checks
+the production hostname and form-specific action, validates fields and enforces a
+server-side honeypot. A locked rolling quota caps verified email attempts at 100 per
+hour across both forms. SMTP and verification failures fail closed, retain browser
+inputs and offer WhatsApp. Quota state contains timestamps only; this site does not
+save enquiry content to disk.
 
 Local configuration in ignored `webstore/.env.local`:
 
 ```dotenv
-PUBLIC_WEB3FORMS_ACCESS_KEY=your_public_form_access_key
+PUBLIC_TURNSTILE_SITE_KEY=your_public_turnstile_site_key
 ```
 
-Restart the dev server after configuration. The public identifier is embedded at
-build time. Without it, email is disabled while WhatsApp works. For local hCaptcha
-checks, open `http://webstore.localhost:4322` in Chrome; it resolves to localhost.
-Sending with a valid production key and solved captcha sends a real email, even
-from a local preview. Use clearly labelled test submissions and the approved inbox.
-Check missing, invalid and reused tokens through browser requests before accepting
-a new provider or configuration; the free API rejects server-to-server requests.
+Restart the dev server after changing configuration. Only the public site key is
+embedded in the build. Astro's local server does not execute PHP; use the native
+Node/PHP tests for local behavior, then verify the deployed PHP endpoint with
+labelled enquiries. Never place production secrets in `public/` or `dist/`.
 
-The email helper retains entered details on errors, prevents duplicate in-flight
-submissions, and resets the single-use token after each attempt. Optional visitor
-email is used for replies; phone remains required. Verify inbox receipt when
-activating or changing delivery. Automated local delivery checks run with
-`node --test tests/enquiry-email.test.mjs`, and also run in the Webstore workflow.
+Server configuration lives outside the public website, in
+`/home/customer/.webstore-forms/config.json` (mode 0600, directory mode 0700):
 
-The homepage collects name, business, city and phone, with optional email and
-message. Pricing buttons select the monthly or annual plan; email and WhatsApp
-include that preference. WhatsApp preparation does not require hCaptcha and
-never sends a message automatically.
+```json
+{
+  "turnstile_secret": "PRIVATE_TURNSTILE_SECRET",
+  "smtp_host": "gnldm1057.siteground.biz",
+  "smtp_username": "website@webstore.pk",
+  "smtp_password": "PRIVATE_MAILBOX_PASSWORD"
+}
+```
+
+SMTP uses the verified SiteGround server hostname `gnldm1057.siteground.biz`
+on TLS port 465 with certificate verification enabled. The public mail hostname
+is proxied in Cloudflare, so this connection deliberately uses the server hostname. PHPMailer 7.1.1's
+three required source files and its license are included under `public/api/mail/`.
+The recipient and sender are fixed in server code, not accepted from browser input.
+The server needs PHP 8.1+ with curl, openssl and mbstring. No database is required.
+Keep the private config outside Git and deploy archives. Update it through the
+owner's authorized SSH setup connection, never through a public settings endpoint.
+
+Checks: `node --test tests/enquiry-email.test.mjs`,
+`php tests/enquiry-handler.test.php`, and the existing Python deployment tests.
+Live release verification must include accepted home/partner enquiries, rejection
+of missing, tampered and reused real tokens, optional visitor email, and WhatsApp.
+A successful SMTP response confirms acceptance by the mail server; verify inbox
+receipt separately. The public endpoint deliberately returns JSON HTTP 405 to GET.
 
 Webstore.pk uses its own SiteGround account, document root
 `/home/customer/www/webstore.pk/public_html`, and GitHub environment
 `webstore-production`, restricted to `main`. The workflow
 `.github/workflows/deploy-webstore.yml` builds `webstore/dist`, runs deployment
-protection tests, packages checksummed static files, publishes through the
+protection tests, packages checksummed pages and the exact approved PHP files, publishes through the
 forced-command receiver, flushes SiteGround caching, and verifies all generated
 pages and assets on both `webstore.pk` and `www.webstore.pk`. Public verification
 ignores only Cloudflare's recognized injected analytics script, matching the
 existing ICTmates verification approach.
 
 The environment contains `SITEGROUND_DEPLOY_KEY` (a dedicated Webstore-only key)
-and `PUBLIC_WEB3FORMS_ACCESS_KEY` (the public form identifier, stored as an
+and `PUBLIC_TURNSTILE_SITE_KEY` (the public widget identifier, stored as an
 environment secret for configuration). The SSH host is pinned in `ops/webstore_siteground_known_hosts`.
 The installed receiver must match `ops/deploy_webstore_receiver.py`. It lives at
 `/home/customer/.webstore-deploy/deploy_receiver.py`; overwritten files and
 receipts are retained outside the web root under the same state directory.
 The existing `Default.html`, `.well-known`, and other unmanaged files are preserved.
 A protected folder that does not exist is recorded as absent and must remain so.
-The independent ICTmates receiver and its destination are unchanged.
+The independent ICTmates receiver and its destination are unchanged. Webstore's
+receiver permits only four specific PHP paths: `api/enquiry.php` and the three
+PHPMailer classes. Other executable paths remain forbidden. Package Webstore with
+`ops/build_release.py --webstore`; the default packager remains static-only.
+Install receiver changes through authorized SSH before releasing them. Source hashes
+are checked on the server; public verification checks PHP execution instead of
+requesting its source.
 
 Public homepage and partner pages permit indexing and are listed in `sitemap.xml`.
 The `/login/` page provides store-access guidance and remains excluded from indexing;

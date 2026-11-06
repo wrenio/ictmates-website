@@ -12,22 +12,24 @@ test('email requires verification, handles API rejection, and consumes tokens on
   const status = { textContent: '' };
   const container = { clientWidth: 240 };
   const form = {
-    dataset: { emailKey: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee' },
+    dataset: { captchaKey: 'public-site-key', enquiryKind: 'store' },
     querySelector: selector => selector === '[data-captcha]' ? container : captchaStatus,
   };
-  globalThis.window = { setTimeout, clearTimeout, hcaptcha: {
+  globalThis.window = { setTimeout, clearTimeout, turnstile: {
     render: (_container, options) => { callbacks = options; return 'widget'; },
     reset: () => { resetCount++; },
   } };
   globalThis.document = { createElement: () => ({}), head: { append: value => { script = value; window.webstoreCaptchaReady(); } } };
   globalThis.FormData = class { get(key) { return values.get(key); } };
   globalThis.fetch = async (_url, options) => {
+    assert.equal(_url, '/api/enquiry.php');
     requests.push(JSON.parse(options.body));
     return { ok: true, json: async () => ({ success: true }) };
   };
   try {
     const send = setupEnquiryEmail(form, button, status);
-    assert.equal(callbacks.size, 'compact');
+    assert.equal(callbacks.size, 'flexible');
+    assert.equal(callbacks.action, 'store');
     await send('message', 'Store');
     assert.equal(requests.length, 0, 'No token must never reach email provider');
     callbacks.callback('verified-token');
@@ -37,12 +39,11 @@ test('email requires verification, handles API rejection, and consumes tokens on
     values.set('website', '');
     await send('message', 'Store');
     assert.equal(requests.length, 1);
-    assert.equal(requests[0]['h-captcha-response'], 'verified-token');
+    assert.equal(requests[0].token, 'verified-token');
     assert.equal(requests[0].name, 'Test enquiry');
-    assert.equal(requests[0].subject, 'Store');
-    assert.equal(requests[0].access_key, form.dataset.emailKey);
-    assert.equal(requests[0].botcheck, false);
-    assert.equal('email' in requests[0], false, 'Optional email remains optional');
+    assert.equal(requests[0].kind, 'store');
+    assert.equal(requests[0].website, '');
+    assert.equal(requests[0].email, '', 'Optional email remains optional');
     assert.match(status.textContent, /Thank you/);
     assert.ok(resetCount > 0);
     await send('message', 'Store');

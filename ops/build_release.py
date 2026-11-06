@@ -8,7 +8,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 from deploy_receiver import MANIFEST, MAX_EXPANDED, safe_name
 
-def build(dist, output, commit):
+def build(dist, output, commit, webstore=False):
     if not re.fullmatch(r'[0-9a-f]{40}', commit):
         raise ValueError('A full Git commit SHA is required')
     files = {}
@@ -17,7 +17,11 @@ def build(dist, output, commit):
             raise ValueError('Build output contains a symlink')
         if path.is_file():
             name = path.relative_to(dist).as_posix()
-            safe_name(name)
+            if webstore:
+                from deploy_webstore_receiver import safe_name as webstore_safe_name
+                webstore_safe_name(name)
+            else:
+                safe_name(name)
             files[name] = path.read_bytes()
     if 'index.html' not in files or sum(map(len, files.values())) > MAX_EXPANDED:
         raise ValueError('Invalid static build')
@@ -35,5 +39,6 @@ if __name__ == '__main__':
     parser.add_argument('--dist', type=Path, default=Path('dist'))
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--commit', required=True)
+    parser.add_argument('--webstore', action='store_true', help='Allow the exact Webstore enquiry handler paths')
     args = parser.parse_args()
-    build(args.dist, args.output, args.commit)
+    build(args.dist, args.output, args.commit, args.webstore)

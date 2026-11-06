@@ -1,6 +1,7 @@
 type Turnstile = {
   render: (container: HTMLElement, options: Record<string, unknown>) => string;
   reset: (id: string) => void;
+  remove: (id: string) => void;
 };
 
 /** Shared email delivery; WhatsApp preparation does not depend on this service. */
@@ -26,12 +27,21 @@ export function setupEnquiryEmail(form: HTMLFormElement, button: HTMLButtonEleme
     script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=webstoreCaptchaReady&render=explicit';
     script.async = true;
     script.onerror = unavailable;
-    captchaWindow.webstoreCaptchaReady = () => {
+    let widgetSize: 'compact' | 'flexible' | undefined;
+    const renderWidget = () => {
+      const size = container.clientWidth < 300 ? 'compact' : 'flexible';
+      if (widget !== undefined && size === widgetSize) return;
       try {
+        if (widget !== undefined) {
+          captchaWindow.turnstile?.remove(widget);
+          widget = undefined;
+        }
+        token = '';
+        widgetSize = size;
         widget = captchaWindow.turnstile?.render(container, {
           sitekey,
           theme: 'light',
-          size: container.clientWidth < 300 ? 'compact' : 'flexible',
+          size,
           action: kind,
           callback: (value: string) => {
             token = value;
@@ -50,6 +60,12 @@ export function setupEnquiryEmail(form: HTMLFormElement, button: HTMLButtonEleme
         if (widget === undefined) unavailable();
         else captchaStatus.textContent = 'Complete the spam-protection check to send by email.';
       } catch { unavailable(); }
+    };
+    captchaWindow.webstoreCaptchaReady = () => {
+      renderWidget();
+      new ResizeObserver(() => {
+        if (widget !== undefined) renderWidget();
+      }).observe(container);
     };
     document.head.append(script);
   }

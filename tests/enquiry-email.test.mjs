@@ -4,8 +4,8 @@ import { setupEnquiryEmail } from '../webstore/src/scripts/enquiry-email.ts';
 
 // Exercise delivery decisions independently of third-party services and real inboxes.
 test('email requires verification, handles API rejection, and consumes tokens once', async () => {
-  const originals = Object.fromEntries(['window', 'document', 'FormData', 'fetch'].map(key => [key, globalThis[key]]));
-  let callbacks, script, resetCount = 0, requests = [];
+  const originals = Object.fromEntries(['window', 'document', 'FormData', 'fetch', 'ResizeObserver'].map(key => [key, globalThis[key]]));
+  let callbacks, script, resize, resetCount = 0, removeCount = 0, renderCount = 0, requests = [];
   const values = new Map([['name', ' Test enquiry '], ['email', ''], ['website', '']]);
   const captchaStatus = { textContent: '' };
   const button = { disabled: true, textContent: '' };
@@ -16,9 +16,14 @@ test('email requires verification, handles API rejection, and consumes tokens on
     querySelector: selector => selector === '[data-captcha]' ? container : captchaStatus,
   };
   globalThis.window = { setTimeout, clearTimeout, turnstile: {
-    render: (_container, options) => { callbacks = options; return 'widget'; },
+    render: (_container, options) => { callbacks = options; renderCount++; return 'widget'; },
     reset: () => { resetCount++; },
+    remove: () => { removeCount++; },
   } };
+  globalThis.ResizeObserver = class {
+    constructor(callback) { resize = callback; }
+    observe(target) { assert.equal(target, container); }
+  };
   globalThis.document = { createElement: () => ({}), head: { append: value => { script = value; window.webstoreCaptchaReady(); } } };
   globalThis.FormData = class { get(key) { return values.get(key); } };
   globalThis.fetch = async (_url, options) => {
@@ -30,6 +35,21 @@ test('email requires verification, handles API rejection, and consumes tokens on
     const send = setupEnquiryEmail(form, button, status);
     assert.equal(callbacks.size, 'compact');
     assert.equal(callbacks.action, 'store');
+    resize();
+    assert.equal(renderCount, 1, 'Same size must preserve the widget');
+    container.clientWidth = 400;
+    resize();
+    assert.equal(callbacks.size, 'flexible');
+    callbacks.callback('desktop-token');
+    container.clientWidth = 210;
+    resize();
+    assert.equal(callbacks.size, 'compact', 'Shrinking the form replaces the wide widget');
+    assert.equal(removeCount, 2);
+    await send();
+    assert.equal(requests.length, 0, 'Resizing invalidates the removed widget’s token');
+    container.clientWidth = 240;
+    resize();
+    assert.equal(renderCount, 3, 'Resizing within compact mode does not restart verification');
     await send('message', 'Store');
     assert.equal(requests.length, 0, 'No token must never reach email provider');
     callbacks.callback('verified-token');

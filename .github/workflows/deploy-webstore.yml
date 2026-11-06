@@ -120,7 +120,9 @@ jobs:
                           raise SystemExit('Public file differs from release: ' + path)
                   print(host + '/' + route + ' matches release')
               try:
-                  urllib.request.urlopen('https://' + host + '/api/enquiry.php', timeout=30)
+                  endpoint = urllib.request.Request('https://' + host + '/api/enquiry.php',
+                      headers={'User-Agent': 'Webstore-Public-Verification/1.0'})
+                  urllib.request.urlopen(endpoint, timeout=30)
                   raise SystemExit('Enquiry endpoint must reject GET')
               except urllib.error.HTTPError as error:
                   if error.code != 405 or json.load(error).get('success') is not False:

@@ -31,7 +31,7 @@ export function setupEnquiryEmail(form: HTMLFormElement, button: HTMLButtonEleme
         widget = captchaWindow.turnstile?.render(container, {
           sitekey,
           theme: 'light',
-          size: 'flexible',
+          size: container.clientWidth < 300 ? 'compact' : 'flexible',
           action: kind,
           callback: (value: string) => {
             token = value;

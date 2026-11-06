@@ -28,7 +28,7 @@ test('email requires verification, handles API rejection, and consumes tokens on
   };
   try {
     const send = setupEnquiryEmail(form, button, status);
-    assert.equal(callbacks.size, 'flexible');
+    assert.equal(callbacks.size, 'compact');
     assert.equal(callbacks.action, 'store');
     await send('message', 'Store');
     assert.equal(requests.length, 0, 'No token must never reach email provider');

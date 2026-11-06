@@ -67,7 +67,9 @@ Webstore.pk uses its own SiteGround account, document root
 `.github/workflows/deploy-webstore.yml` builds `webstore/dist`, runs deployment
 protection tests, packages checksummed static files, publishes through the
 forced-command receiver, flushes SiteGround caching, and verifies all generated
-pages and assets on both `webstore.pk` and `www.webstore.pk`.
+pages and assets on both `webstore.pk` and `www.webstore.pk`. Public verification
+ignores only Cloudflare's recognized injected analytics script, matching the
+existing ICTmates verification approach.
 
 The environment contains `SITEGROUND_DEPLOY_KEY` (a dedicated Webstore-only key)
 and `PUBLIC_WEB3FORMS_ACCESS_KEY` (the public form key linked to the approved
@@ -84,10 +86,11 @@ The `/login/` page provides store-access guidance and remains excluded from inde
 each client receives its own admin URL. It does not implement authentication.
 The final supplied WebP logo is unchanged; the page pairs ICTmates blue with teal accents.
 
-Cloudflare should proxy only the marketing apex and www records for this release,
-with Full (strict) TLS, HTTPS redirection, and HTTP/3. Use normal static-asset caching
-and leave HTML uncached so enquiry pages and releases appear immediately without
-a cache-purge credential. Do not enable a zone-wide Cache Everything rule or apply
+Cloudflare proxies the marketing apex and www records, with Full (strict) TLS,
+HTTPS redirection, HTTP/2 and HTTP/3. Smart Tiered Cache is enabled. Static assets
+use normal edge caching; HTML remains uncached so enquiry pages and releases
+appear immediately without a cache-purge credential. Existing client subdomain
+and email DNS records are unchanged. Do not enable a zone-wide Cache Everything rule or apply
 marketing rules to client subdomains. CSS and JavaScript build filenames are hashed;
 version image/font filenames when changing their contents, or purge the changed URLs.
 

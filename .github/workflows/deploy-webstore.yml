@@ -94,9 +94,14 @@ jobs:
       - name: Verify public pages and assets
         run: |
           python3 - <<'PY'
-          import hashlib, urllib.request
+          import re, urllib.request
           from pathlib import Path
           # HTML bypasses Cloudflare caching; hashed assets use normal edge caching.
+          # Ignore only the recognized Cloudflare analytics script, which can vary by region.
+          beacon = re.compile(
+              rb'<script type="module" src="https://static\.cloudflareinsights\.com/beacon\.min\.js/[A-Za-z0-9]+" '
+              rb'integrity="sha512-[A-Za-z0-9+/=]+" '
+              rb'data-cf-beacon=\'[^\'<>]+\' crossorigin="anonymous"></script>\n(?=</body>)')
           root = Path('webstore/dist')
           for host in ('webstore.pk', 'www.webstore.pk'):
               for file in sorted(root.rglob('*')):
@@ -107,7 +112,7 @@ jobs:
                   request = urllib.request.Request('https://' + host + '/' + route,
                       headers={'User-Agent': 'Webstore-Public-Verification/1.0'})
                   with urllib.request.urlopen(request, timeout=30) as response:
-                      if response.status != 200 or response.read() != file.read_bytes():
+                      if response.status != 200 or beacon.sub(b'', response.read(), count=1) != file.read_bytes():
                           raise SystemExit('Public file differs from release: ' + path)
                   print(host + '/' + route + ' matches release')
           PY

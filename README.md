@@ -30,6 +30,69 @@ npm run dev
 
 ## Build and verify
 
+### Webstore.pk
+
+The separate Webstore.pk marketing website is in `webstore/`. It reuses the existing
+Astro dependency and copies the ICTmates design as its starting point. From the
+project root in PowerShell, set `$env:ASTRO_TELEMETRY_DISABLED = '1'`, then run
+`npm run dev:webstore` for the local preview at `http://127.0.0.1:4322`.
+`npm run build:webstore` generates `webstore/dist/`; `npm run preview:webstore`
+serves that build. The existing ICTmates build and deployment remain separate.
+
+The `/partners/` page includes required name, business/creator, city, phone and partner-type fields, plus optional email, in its
+enquiry form. Visitors can send an email through Web3Forms or prepare a WhatsApp
+message to review before opening WhatsApp. Editing the fields clears the prepared
+WhatsApp link until the message is regenerated. No enquiry is stored by this site.
+
+To enable email delivery locally, create `webstore/.env.local` (ignored by Git) with
+`PUBLIC_WEB3FORMS_ACCESS_KEY=your_access_key`, using a Web3Forms key linked to the
+intended receiving inbox. Restart the dev server after configuring it; static
+builds require the key at build time. This is a public form access key, rendered
+into the page as intended by Web3Forms, not an email password or private API token.
+Without a key, email submission stays disabled and WhatsApp remains available.
+With a key, clicking Send enquiry by email makes a real Web3Forms request even on
+localhost. Optional visitor email is used for replies; phone remains required.
+The form keeps entered details on failure and reports success only after API
+confirmation. Inbox receipt must still be checked when activating the connection.
+
+The homepage contact form uses the same Web3Forms key and offers WhatsApp as an
+alternative. It collects name, business, city and phone, with optional email and
+message. Pricing buttons select the monthly or annual plan in the form; both
+email and WhatsApp enquiries include that preference. Homepage email enquiries
+use the subject `Webstore.pk webshop enquiry` to distinguish them from partners.
+
+Webstore.pk uses its own SiteGround account, document root
+`/home/customer/www/webstore.pk/public_html`, and GitHub environment
+`webstore-production`, restricted to `main`. The workflow
+`.github/workflows/deploy-webstore.yml` builds `webstore/dist`, runs deployment
+protection tests, packages checksummed static files, publishes through the
+forced-command receiver, flushes SiteGround caching, and verifies all generated
+pages and assets on both `webstore.pk` and `www.webstore.pk`.
+
+The environment contains `SITEGROUND_DEPLOY_KEY` (a dedicated Webstore-only key)
+and `PUBLIC_WEB3FORMS_ACCESS_KEY` (the public form key linked to the approved
+receiving inbox). The SSH host is pinned in `ops/webstore_siteground_known_hosts`.
+The installed receiver must match `ops/deploy_webstore_receiver.py`. It lives at
+`/home/customer/.webstore-deploy/deploy_receiver.py`; overwritten files and
+receipts are retained outside the web root under the same state directory.
+The existing `Default.html`, `.well-known`, and other unmanaged files are preserved.
+A protected folder that does not exist is recorded as absent and must remain so.
+The independent ICTmates receiver and its destination are unchanged.
+
+Public homepage and partner pages permit indexing and are listed in `sitemap.xml`.
+The `/login/` page provides store-access guidance and remains excluded from indexing;
+each client receives its own admin URL. It does not implement authentication.
+The final supplied WebP logo is unchanged; the page pairs ICTmates blue with teal accents.
+
+Cloudflare should proxy only the marketing apex and www records for this release,
+with Full (strict) TLS, HTTPS redirection, and HTTP/3. Use normal static-asset caching
+and leave HTML uncached so enquiry pages and releases appear immediately without
+a cache-purge credential. Do not enable a zone-wide Cache Everything rule or apply
+marketing rules to client subdomains. CSS and JavaScript build filenames are hashed;
+version image/font filenames when changing their contents, or purge the changed URLs.
+
+### ICTmates
+
 ```sh
 export ASTRO_TELEMETRY_DISABLED=1
 npm run build

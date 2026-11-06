@@ -1,0 +1,287 @@
+---
+import '../styles/global.css';
+import '../styles/webstore.css';
+const web3formsKey = (import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY || '').trim();
+const faqs = [
+  ['What is the difference between a reseller and an affiliate?', 'Resellers are technical professionals, agencies and IT businesses that help clients choose, set up and run online stores. Affiliates promote Webstore.pk through an audience, content or recommendations and introduce potential customers. Choose the route by the work you want to do, rather than your business title.'],
+  ['What commission or margin will I receive?', 'Commission rates, reseller margins, eligibility and payment terms are still to be confirmed. Express your interest so we can discuss the proposed arrangement before you decide.'],
+  ['Are commissions recurring?', 'This has not been confirmed. Renewal commissions, referral attribution, payment timing and any qualifying conditions will be set out in the final programme terms.'],
+  ['Do I need technical experience?', 'The reseller route is intended for people with experience delivering or managing websites and e-commerce solutions, including Shopify or WooCommerce. Affiliates do not need to build or maintain stores; their focus is useful content, recommendations and introductions. Platform-specific skills and responsibilities will be discussed before joining.'],
+  ['Who handles setup, billing and customer support?', 'Resellers would be involved in client setup, training, store management or technical care within an agreed scope. Affiliates focus on introductions and are not expected to deliver technical services. The customer plan includes hosting and support; billing, escalation and the division of responsibilities with ICT Mates remain to be agreed.'],
+  ['I already work with Shopify or WooCommerce. Is this for me?', 'Yes. Add a managed alternative for clients who value predictable costs in rupees, local support and AI content assistance in their admin. Demonstrate the product workflow and compare the total cost of the client’s required setup, including hosting, apps or plugins and ongoing care. Any migration, custom work or integration needs a separate scope review; compatibility with another platform’s themes, apps or plugins is not implied.'],
+  ['What would an affiliate do?', 'Help a relevant audience understand the service through demonstrations, tutorials, articles, videos or recommendations, then introduce interested businesses to ICT Mates. Affiliate commission, referral tracking and qualifying conditions are still to be confirmed.'],
+  ['Can an agency be an affiliate?', 'Yes. An agency focused on content, publishing or audience referrals may fit the affiliate route. An agency delivering technical setup or ongoing store management may fit the reseller route. If you do both, tell us so we can discuss the right arrangement.'],
+  ['Can resellers offer their own client services?', 'Potential services include catalogue preparation, reviewing AI-generated product copy and image alt text, client training, store administration and ongoing technical care. These complement the managed platform. Any service scope, fees and support boundaries must be agreed clearly; they are not automatically included in the Webstore.pk subscription.'],
+  ['What should I highlight when introducing Webstore.pk?', 'Lead with the complete managed offer: a dedicated shop, hosting, local support, predictable pricing in rupees and local subscription payments. Show the built-in AI tools for product titles, full and short descriptions and image alt text, plus SEO and GEO optimization. Compare the full cost and fit of the client’s alternatives, rather than promising savings for every setup.'],
+  ['How should I demonstrate AI, SEO and GEO to clients?', 'Show how AI drafts product titles, descriptions, short descriptions and image alt text inside the admin, then review the output with the client before publishing. Explain SEO as search engine optimization and GEO as optimization for discovery through AI-powered search and answer tools. These support discoverability, but do not guarantee rankings, traffic or AI recommendations.'],
+  ['Can I offer the service under my own brand?', 'White-label arrangements, exclusivity and territory rights are not confirmed parts of this draft programme. Discuss your requirements with ICT Mates.'],
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preload" href="/fonts/dm-sans-latin-v17.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/manrope-latin-v23.woff2" as="font" type="font/woff2" crossorigin />
+    <title>Resellers & affiliates | Webstore.pk</title>
+    <meta name="description" content="Explore reseller and affiliate opportunities with Webstore.pk by ICT Mates. Help businesses in Pakistan start their own online stores. Programme terms to be confirmed." />
+    <link rel="canonical" href="https://webstore.pk/partners/" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="theme-color" content="#101b8e" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <div class="announcement">Partner programme draft <span>·</span> Commission rates and terms to be confirmed</div>
+    <header class="header wrap">
+      <a class="logo" href="/" aria-label="Webstore.pk home"><img src="/webstore-logo.webp" alt="Webstore.pk" width="600" height="132" /></a>
+      <nav aria-label="Main navigation"><a href="/">Webshops</a><a href="#partner-paths">Partner options</a><a href="#how-it-works">How it works</a><a href="#faq">FAQs</a></nav>
+      <a class="button small" href="#partner-contact">Let’s talk ↗︎</a>
+    </header>
+    <main id="main">
+      <section class="hero wrap partner-hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="status-dot"></span> PARTNER WITH WEBSTORE.PK</div>
+          <h1>Your network.<br /><em>Their next<br />online store.</em></h1>
+          <p class="intro">Help businesses choose a cost-effective managed alternative to Shopify, WooCommerce and other e-commerce solutions—with built-in AI help, prices in rupees and local support from ICT Mates.</p>
+          <div class="actions"><a class="button" href="#partner-paths">Find your partner path ↓</a><a class="text-link" href="/">Explore Webstore.pk ↗︎</a></div>
+          <p class="partner-hero-note">For technical agencies and IT businesses, influencers, content creators and publishers.</p>
+        </div>
+        <div class="partner-visual" aria-label="Resellers and affiliates connecting businesses with their own Webstore.pk stores">
+          <span class="eyebrow">GOOD CONNECTIONS. NEW POSSIBILITIES.</span>
+          <div class="network-paths"><div><span class="network-symbol" aria-hidden="true">↗</span><strong>Resellers</strong><span>Technical client services</span></div><div><span class="network-symbol" aria-hidden="true">↗</span><strong>Affiliates</strong><span>Content & referrals</span></div></div>
+          <div class="network-connector" aria-hidden="true">↓</div>
+          <div class="network-hub"><img src="/webstore-logo.webp" alt="Webstore.pk" width="600" height="132" /><span>A service by ICT Mates</span></div>
+          <div class="network-connector" aria-hidden="true">↓</div>
+          <div class="network-store"><div class="store-awning" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><span>YOUR CLIENT’S BUSINESS</span><strong>Their brand.<br />Their own store.</strong><p>Powered by Wrenio Commerce</p></div>
+        </div>
+      </section>
+      <section class="section wrap" id="partner-paths">
+        <div class="section-heading"><div><div class="eyebrow">TWO WAYS TO WORK TOGETHER</div><h2>Choose the role<br /><em>that fits you.</em></h2></div><p>Bring your existing strengths to the conversation. These are proposed partner models; the details will be agreed before you join.</p></div>
+        <div class="partner-options">
+          <article class="plan"><span class="eyebrow"><svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/info-icons.svg#code" /></svg> RESELLER PARTNERS</span><h3>Offer clients a<br />managed alternative.</h3><p class="partner-description">For technical professionals, agencies and IT businesses working with Shopify, WooCommerce or other e-commerce solutions. Offer clients a managed webshop with predictable pricing in rupees, local subscription payments and a team in Lahore behind it.</p><ul><li>Offer hosting and local support in one managed subscription</li><li>Demonstrate the built-in AI features to your clients</li><li>Introduce an SEO & GEO optimized storefront</li><li>Add catalogue preparation, training or ongoing client services within an agreed scope</li></ul><p class="pending"><strong>Contact us</strong> for reseller margins, billing arrangements and support responsibilities.</p><a class="button outline" href="#partner-contact" data-partner="reseller">I’m interested in reselling ↗︎</a></article>
+          <article class="plan featured"><span class="eyebrow"><svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/info-icons.svg#megaphone" /></svg> AFFILIATE PARTNERS</span><h3>Make an introduction.<br />Start a conversation.</h3><p class="partner-description">For influencers, content creators, publishers and agencies that reach business owners through content, communities or recommendations.</p><ul><li>Explain the service through videos, tutorials, articles or reviews</li><li>Introduce interested business owners to ICT Mates</li><li>Focus on your audience without providing technical store support</li></ul><p class="pending"><strong>Contact us</strong> for commission rates, qualifying referrals, tracking and payment terms.</p><a class="button" href="#partner-contact" data-partner="affiliate">I’m interested in referrals ↗︎</a></article>
+        </div>
+      </section>
+      <section class="demo-section wrap partner-offer">
+        <div class="demo-copy"><div class="eyebrow">A PRACTICAL OFFER TO INTRODUCE</div><h2>A store of their own.<br />A team behind it.</h2><p>Webstore.pk combines a dedicated managed shop, hosting and local support. Built-in AI helps clients draft product titles, descriptions, short descriptions and image alt text inside their admin panel.</p><p>The storefront is SEO and GEO optimized for search and AI discovery. Clients can start with a webstore.pk subdomain and connect their own domain when ready.</p><a class="button light" href="/#pricing">See customer plans ↗︎</a></div>
+        <div class="platform-card"><span class="eyebrow">THE CUSTOMER OFFER</span><h3>Built for businesses<br />in Pakistan.</h3><ul><li><span><svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/info-icons.svg#store" /></svg></span> Their own brand and storefront</li><li><span><svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/info-icons.svg#headset" /></svg></span> Hosting and local support included</li><li><span><svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/info-icons.svg#box" /></svg></span> Product & order admin with built-in AI help</li><li><span><svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/info-icons.svg#wallet" /></svg></span> No marketplace sales commission</li></ul><p class="offer-note">Custom domain registration and third-party charges are separate. Customer plan prices are not partner commission rates.</p></div>
+      </section>
+      <section class="section wrap" id="how-it-works">
+        <div class="section-heading"><div><div class="eyebrow">LET’S FIND THE RIGHT FIT</div><h2>Start with<br /><em>a conversation.</em></h2></div><p>Tell us who you work with and how you would like to introduce Webstore.pk.</p></div>
+        <ol class="steps"><li><span><svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/info-icons.svg#person" /></svg></span><h3>Tell us about yourself</h3><p>Share your business or professional background, location and the customers or audience you reach.</p></li><li><span><svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/info-icons.svg#compass" /></svg></span><h3>Explore the opportunity</h3><p>Talk through the service, your preferred partner model and how we could work together.</p></li><li><span><svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="/info-icons.svg#agreement" /></svg></span><h3>Agree the details</h3><p>Review the proposed commercial terms and responsibilities before deciding whether to proceed.</p></li></ol>
+      </section>
+      <aside class="wrap partner-terms" aria-labelledby="terms-title"><div class="eyebrow">CLEAR FROM THE START</div><h2 id="terms-title">The opportunity is taking shape.</h2><p>This is a draft partner programme. Commission rates, reseller margins, payment schedules, eligibility, renewal arrangements and programme terms are <strong>to be confirmed</strong>. An enquiry expresses interest; it does not enrol you or agree commercial terms.</p></aside>
+      <section class="section wrap faq" id="faq"><div><div class="eyebrow">PARTNER QUESTIONS</div><h2>A few things<br /><em>to know.</em></h2><p>Have a different partnership in mind?<br /><a class="text-link" href="#partner-contact">Talk to ICT Mates ↗︎</a></p></div><div class="faq-list">{faqs.map(([q,a])=><details><summary>{q}<span aria-hidden="true">+</span></summary><p>{a}</p></details>)}</div></section>
+      <section class="contact wrap" id="partner-contact">
+        <div><div class="eyebrow">YOUR NEXT BUSINESS CONVERSATION</div><h2>Let’s explore<br />working together.</h2><p>Tell us a little about yourself and choose the role that fits your work. Send your enquiry by email, or prepare a message to share with ICT Mates on WhatsApp.</p><p class="partner-role-help">Choose <strong>reseller</strong> for technical client services, or <strong>affiliate</strong> for content and referrals.</p><div class="partner-direct"><p>Prefer a conversation? Call or WhatsApp ICT Mates.</p><a class="partner-phone" href="tel:+923005551575">+92 300 555 1575</a><a class="partner-reset text-link" href="https://wa.me/923005551575?text=Hello%20ICT%20Mates%2C%20please%20help%20me%20choose%20a%20Webstore.pk%20partner%20route." target="_blank" rel="noopener noreferrer">Chat on WhatsApp ↗︎</a></div></div>
+        <div class="partner-form-panel">
+          <form id="partner-enquiry" aria-labelledby="enquiry-title" data-email-key={web3formsKey}>
+            <input type="checkbox" name="botcheck" tabindex="-1" aria-hidden="true" class="botcheck" />
+            <h3 id="enquiry-title">Partner enquiry</h3>
+            <p class="form-intro"><span class="required-mark" aria-hidden="true">*</span> Required fields. Choose email or WhatsApp below.</p>
+            <div class="form-fields">
+              <div class="form-field"><label for="partner-name">Your name <span class="required-mark" aria-hidden="true">*</span></label><input id="partner-name" name="name" type="text" autocomplete="name" maxlength="100" required /></div>
+              <div class="form-field"><label for="partner-business">Business / creator name <span class="required-mark" aria-hidden="true">*</span></label><input id="partner-business" name="business" type="text" autocomplete="organization" maxlength="120" aria-describedby="business-help" required /><small id="business-help">Your agency, business, channel or publishing name.</small></div>
+              <div class="form-field"><label for="partner-city">City <span class="required-mark" aria-hidden="true">*</span></label><input id="partner-city" name="city" type="text" autocomplete="address-level2" maxlength="80" required /></div>
+              <div class="contact-fields">
+                <div class="form-field"><label for="partner-email">Email <span class="optional-label">(optional)</span></label><input id="partner-email" name="email" type="email" autocomplete="email" maxlength="254" /></div>
+                <div class="form-field"><label for="partner-phone">Phone number <span class="required-mark" aria-hidden="true">*</span></label><input id="partner-phone" name="phone" type="tel" autocomplete="tel" maxlength="40" required /></div>
+              </div>
+            </div>
+            <fieldset><legend>I’m interested in <span class="required-mark" aria-hidden="true">*</span></legend><div class="role-options"><label><input type="radio" name="partner_type" value="reseller" required /> Reseller</label><label><input type="radio" name="partner_type" value="affiliate" required /> Affiliate</label></div></fieldset>
+            <p id="partner-interest" class="form-status" aria-live="polite">Choose your partner route.</p>
+            <div class="enquiry-actions"><button class="button" type="submit" id="send-email" disabled aria-describedby="email-status">Send enquiry by email ↗︎</button><button class="button outline" type="submit" id="prepare-enquiry" disabled>Prepare WhatsApp message ↓</button></div>
+            <p id="email-status" class="form-status email-status" role="status">{web3formsKey ? 'Email enquiries are sent through Web3Forms to ICT Mates.' : 'Local preview: email delivery awaits connection. You can still use WhatsApp.'}</p>
+            <noscript><p>Enable JavaScript to prepare your details, or <a href="https://wa.me/923005551575" target="_blank" rel="noopener noreferrer">contact ICT Mates on WhatsApp</a>.</p></noscript>
+          </form>
+          <div id="enquiry-preview" class="enquiry-preview" hidden>
+            <h4>Your message</h4><p id="enquiry-message"></p>
+            <a class="button" id="partner-whatsapp" target="_blank" rel="noopener noreferrer">Open WhatsApp ↗︎</a>
+            <p class="send-note">Preparing this message does not send it. Opening WhatsApp shares these details with WhatsApp; you choose when to send it to ICT Mates.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="wrap footer"><a class="logo" href="/" aria-label="Webstore.pk home"><img src="/webstore-logo.webp" alt="Webstore.pk" width="600" height="132" loading="lazy" /></a><p>Your business. Your online store.</p><nav aria-label="Footer navigation"><a href="/">Webshops</a><a href="/#pricing">Pricing</a><a href="/partners/" aria-current="page">Partners</a><a href="/login/">Store login</a></nav><div class="footer-bottom"><span>© {new Date().getFullYear()} Webstore.pk · A service by <a href="https://ictmates.com/" target="_blank" rel="noopener noreferrer">ICT Mates</a>.</span><span>Powered by <a href="https://wreniocommerce.com/" target="_blank" rel="noopener noreferrer">Wrenio Commerce</a> · Built by <a href="https://wrenio.studio/" target="_blank" rel="noopener noreferrer">Wrenio Studio</a></span></div></footer>
+    <script>
+      const form = document.querySelector<HTMLFormElement>('#partner-enquiry');
+      const preview = document.querySelector<HTMLDivElement>('#enquiry-preview');
+      const messageText = document.querySelector<HTMLParagraphElement>('#enquiry-message');
+      const whatsapp = document.querySelector<HTMLAnchorElement>('#partner-whatsapp');
+      const status = document.querySelector<HTMLParagraphElement>('#partner-interest');
+      const prepare = document.querySelector<HTMLButtonElement>('#prepare-enquiry');
+      const sendEmail = document.querySelector<HTMLButtonElement>('#send-email');
+      const emailStatus = document.querySelector<HTMLParagraphElement>('#email-status');
+      if (form && preview && messageText && whatsapp && status && prepare && sendEmail && emailStatus) {
+        const accessKey = form.dataset.emailKey || '';
+        let sending = false;
+        sendEmail.disabled = !accessKey;
+        prepare.disabled = false;
+        const invalidateMessage = () => {
+          const wasPrepared = !preview.hidden;
+          preview.hidden = true;
+          whatsapp.removeAttribute('href');
+          const selected = form.querySelector<HTMLInputElement>('input[name="partner_type"]:checked');
+          status.textContent = wasPrepared ? 'Details changed. Prepare your message again to include the updates.' : selected ? `Selected: ${selected.value === 'reseller' ? 'Reseller — technical client services' : 'Affiliate — content and referrals'}.` : 'Choose your partner route.';
+        };
+        form.addEventListener('input', event => {
+          if (event.target instanceof HTMLInputElement) event.target.setCustomValidity('');
+          invalidateMessage();
+        });
+        document.querySelectorAll<HTMLAnchorElement>('[data-partner]').forEach(link => {
+          link.addEventListener('click', () => {
+            const role = link.dataset.partner;
+            if (role !== 'reseller' && role !== 'affiliate') return;
+            const radio = form.querySelector<HTMLInputElement>(`input[value="${role}"]`);
+            if (radio) radio.checked = true;
+            invalidateMessage();
+            form.querySelector<HTMLInputElement>('#partner-name')?.focus({ preventScroll:true });
+          });
+        });
+        form.addEventListener('submit', async event => {
+          event.preventDefault();
+          form.querySelectorAll<HTMLInputElement>('input[type="text"][required], input[type="tel"][required]').forEach(input => {
+            input.setCustomValidity(input.value.trim() ? '' : 'Please enter a value, not just spaces.');
+          });
+          if (!form.reportValidity()) return;
+          const values = new FormData(form);
+          const role = values.get('partner_type') === 'reseller' ? 'Reseller' : 'Affiliate';
+          const message = [
+            'Hello ICT Mates, I’m interested in the Webstore.pk partner programme.',
+            '',
+            `Name: ${String(values.get('name')).trim()}`,
+            `Business / creator: ${String(values.get('business')).trim()}`,
+            `City: ${String(values.get('city')).trim()}`,
+            `Phone: ${String(values.get('phone')).trim()}`,
+            ...(String(values.get('email')).trim() ? [`Email: ${String(values.get('email')).trim()}`] : []),
+            `Partner type: ${role}`,
+            '',
+            'Please share the proposed programme details and terms.',
+          ].join('\n');
+          if ((event as SubmitEvent).submitter !== prepare) {
+            if (!accessKey || sending) return;
+            if (values.get('botcheck')) return;
+            sending = true;
+            sendEmail.disabled = true;
+            sendEmail.textContent = 'Sending…';
+            emailStatus.textContent = 'Sending your enquiry by email…';
+            const controller = new AbortController();
+            const timeout = window.setTimeout(() => controller.abort(), 20000);
+            try {
+              const email = String(values.get('email')).trim();
+              const response = await fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                signal: controller.signal,
+                body: JSON.stringify({
+                  access_key: accessKey,
+                  subject: `Webstore.pk partner enquiry — ${role}`,
+                  from_name: 'Webstore.pk Partners',
+                  name: String(values.get('name')).trim(),
+                  ...(email ? { email } : {}),
+                  message,
+                  botcheck: false,
+                }),
+              });
+              const result = await response.json();
+              if (!response.ok || result.success !== true) throw new Error('Submission not confirmed');
+              emailStatus.textContent = 'Thank you. Your enquiry has been sent by email to ICT Mates. We’ll contact you using the details you provided.';
+            } catch {
+              emailStatus.textContent = 'We couldn’t confirm email delivery. Your details are still here. Please try again later or use WhatsApp instead.';
+            } finally {
+              window.clearTimeout(timeout);
+              sending = false;
+              sendEmail.disabled = false;
+              sendEmail.textContent = 'Send enquiry by email ↗︎';
+            }
+            return;
+          }
+          messageText.textContent = message;
+          whatsapp.href = `https://wa.me/923005551575?text=${encodeURIComponent(message)}`;
+          preview.hidden = false;
+          status.textContent = 'Your WhatsApp message is ready to review below. It has not been sent to WhatsApp.';
+          whatsapp.focus({ preventScroll:true });
+        });
+      }
+    </script>
+  </body>
+</html>
+<style>
+  .partner-hero h1 { font-size:clamp(48px,5.2vw,72px); }
+  .partner-hero .actions { flex-wrap:wrap; gap:18px; }
+  .partner-hero-note { font-size:12px; max-width:420px; margin:22px 0 0; }
+  .partner-visual { background:#e5f5f3; border:1px solid #c6e7e4; border-radius:100px 100px 24px 24px; padding:40px 32px 30px; text-align:center; }
+  .partner-visual>.eyebrow { justify-content:center; font-size:9px; }
+  .network-paths { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .network-paths>div { background:white; border-radius:12px; padding:18px 10px; box-shadow:var(--shadow-card); border-top:3px solid var(--teal-bright); }
+  .network-paths strong,.network-paths div>span { display:block; }
+  .network-paths div>span:last-child { font-size:11px; color:var(--muted); margin-top:4px; }
+  .network-symbol { color:var(--teal); font-size:22px; }
+  .network-connector { color:var(--teal); font-size:28px; line-height:1.5; }
+  .network-hub { background:#fff; border:1px solid var(--teal-bright); padding:20px; border-radius:12px; box-shadow:0 8px 20px rgb(0 125 131 / 10%); }
+  .network-hub img { display:block; width:210px; max-width:100%; height:auto; margin:auto; }
+  .network-hub>span { display:block; color:var(--muted); font-size:10px; margin-top:9px; }
+  .network-store { position:relative; padding:38px 20px 16px; background:#fff; border-radius:8px 8px 14px 14px; overflow:hidden; box-shadow:var(--shadow-card); }
+  .store-awning { display:flex; position:absolute; top:0; left:0; right:0; height:18px; }
+  .store-awning i { flex:1; background:#007d83; border-radius:0 0 8px 8px; }
+  .store-awning i:nth-child(even) { background:#d8f3f1; }
+  .network-store>span { font-size:8px; letter-spacing:.14em; color:var(--muted); }
+  .network-store strong { display:block; font-family:'Manrope',sans-serif; font-size:25px; line-height:1.3; letter-spacing:-.04em; margin:8px 0; }
+  .network-store p { font-size:10px; margin:0; }
+  .partner-options { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  .partner-options .plan { display:flex; flex-direction:column; }
+  .partner-options .partner-description { font-size:15px; line-height:1.7; margin-top:0; }
+  .partner-options ul { min-height:0; padding-bottom:0; }
+  .partner-options .pending { font-size:12px; border-top:1px solid var(--line); padding-top:18px; margin-bottom:24px; }
+  .partner-options .button { margin-top:auto; gap:12px; }
+  .offer-note { font-size:11px; color:#d7dffc; margin:20px 0 0; }
+  .partner-terms { background:#eaf3f6; border-left:4px solid var(--teal-bright); border-radius:0 16px 16px 0; padding-block:30px; }
+  .partner-terms h2 { font-size:28px; }
+  .partner-terms p { max-width:900px; margin:0; font-size:14px; }
+  .partner-reset { display:inline-block; color:#d8f3f1; margin-top:20px; }
+  .partner-direct { border-top:1px solid rgb(255 255 255 / 25%); margin-top:28px; padding-top:20px; }
+  .partner-direct p { margin:0 0 10px; font-size:14px; }
+  .partner-phone { display:block; width:fit-content; color:#fff; font-family:'Manrope',sans-serif; font-size:clamp(23px,2.3vw,30px); font-weight:700; text-decoration:none; }
+  .partner-phone:hover { text-decoration:underline; }
+  .partner-direct .partner-reset { margin-top:12px; }
+  #partner-contact { grid-template-columns:1fr 1.15fr; align-items:start; }
+  .partner-role-help { margin-top:20px; }
+  .partner-form-panel { background:#fff; color:var(--ink); padding:24px; border-radius:16px; min-width:0; box-shadow:var(--shadow-card); }
+  .partner-form-panel h3 { font-size:24px; margin:0 0 8px; }
+  .partner-form-panel .form-intro,.partner-form-panel .form-status,.partner-form-panel .send-note { color:var(--muted); font-size:12px; margin:0 0 12px; }
+  .form-fields { display:grid; gap:10px; }
+  .contact-fields { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; }
+  .form-field label,legend { display:block; font-size:13px; font-weight:600; margin-bottom:4px; }
+  .required-mark { color:#b42318; }
+  .optional-label { font-weight:400; color:var(--muted); }
+  .form-field input { display:block; width:100%; min-width:0; min-height:44px; border:1px solid #aebfc8; border-radius:6px; padding:8px 10px; font:inherit; font-size:16px; color:var(--ink); background:#f8fbfc; }
+  .form-field small { display:block; margin-top:3px; color:var(--muted); font-size:11px; }
+  fieldset { border:0; margin:12px 0 10px; padding:0; min-width:0; }
+  .role-options { display:flex; flex-wrap:wrap; gap:12px; }
+  .role-options label { display:flex; align-items:center; gap:8px; min-height:44px; padding:8px 12px; background:#eaf7f5; border:1px solid #aebfc8; border-radius:6px; font-size:14px; cursor:pointer; }
+  .role-options input { accent-color:var(--teal); width:18px; height:18px; margin:0; }
+  input:focus-visible,button:focus-visible { outline:3px solid #bf670e; outline-offset:3px; }
+  .partner-form-panel .button { width:100%; min-height:44px; padding:12px 16px; font-family:inherit; cursor:pointer; gap:10px; }
+  .partner-form-panel button:disabled { cursor:not-allowed; opacity:.6; }
+  .enquiry-actions { display:grid; gap:8px; }
+  .botcheck { display:none; }
+  .partner-form-panel .email-status { margin:10px 0 0; }
+  .enquiry-preview { margin-top:24px; padding-top:22px; border-top:2px solid var(--teal-bright); }
+  .enquiry-preview[hidden] { display:none; }
+  .enquiry-preview h4 { margin:0 0 12px; font-size:16px; }
+  .enquiry-preview #enquiry-message { white-space:pre-wrap; overflow-wrap:anywhere; color:var(--ink); font-size:13px; background:#eaf7f5; padding:16px; border-radius:8px; margin:0 0 18px; }
+  .partner-form-panel .send-note { margin:14px 0 0; }
+  @media(max-width:900px) { #partner-contact { grid-template-columns:1fr; } }
+  @media(max-width:1000px) { .partner-visual { padding:32px 20px 24px; } .partner-terms { margin-inline:25px; } }
+  @media(max-width:720px) {
+    .partner-hero h1 { font-size:clamp(44px,10.5vw,64px); }
+    .partner-visual { width:100%; max-width:480px; justify-self:center; }
+    .partner-options { grid-template-columns:1fr; }
+    .partner-form-panel { padding:22px 18px; }
+    .contact-fields { grid-template-columns:1fr; gap:10px; }
+    .partner-terms { margin-inline:18px; }
+    .network-paths { gap:10px; }
+    .network-paths div>span:last-child { font-size:10px; }
+  }
+</style>

@@ -34,9 +34,11 @@ def package_bytes(files, *, commit=COMMIT, hashes=None, symlinks=()):
 
 
 class ReadPackageTests(unittest.TestCase):
+    receiver = receiver
+
     def assert_rejected(self, payload):
         with self.assertRaises((ValueError, OSError)):
-            receiver.read_package(payload)
+            self.receiver.read_package(payload)
 
     def test_rejects_protected_paths_case_insensitively(self):
         for name in (
@@ -71,7 +73,7 @@ class ReadPackageTests(unittest.TestCase):
             with ZipFile(payload, "w") as archive:
                 archive.writestr("index.html", b"home")
                 archive.writestr("index.html", b"other")
-                archive.writestr(receiver.MANIFEST, manifest)
+                archive.writestr(self.receiver.MANIFEST, manifest)
         self.assert_rejected(payload.getvalue())
 
     def test_rejects_manifest_checksum_mismatch(self):
@@ -82,6 +84,8 @@ class ReadPackageTests(unittest.TestCase):
 
 
 class SafeTargetTests(unittest.TestCase):
+    receiver = receiver
+
     def test_refuses_destination_symlink(self):
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
             root = Path(temp)
@@ -94,17 +98,19 @@ class SafeTargetTests(unittest.TestCase):
             except (OSError, NotImplementedError) as error:
                 self.skipTest("symlinks are unavailable: " + str(error))
             with self.assertRaises(ValueError):
-                receiver.safe_target(root, "assets/site.css")
+                self.receiver.safe_target(root, "assets/site.css")
 
 
 @unittest.skipUnless(os.name == "posix", "publish integration requires POSIX flock")
 class PublishIntegrationTests(unittest.TestCase):
+    receiver = receiver
+
     def test_publish_preserves_protected_and_unknown_files_and_is_repeatable(self):
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
             base = Path(temp)
             root, state = base / "public_html", base / "state"
             root.mkdir()
-            for protected in receiver.PROTECTED:
+            for protected in self.receiver.PROTECTED:
                 directory = root / protected
                 directory.mkdir()
                 (directory / "sentinel.txt").write_text(protected + " sentinel")
@@ -118,17 +124,17 @@ class PublishIntegrationTests(unittest.TestCase):
                 "assets/app-456.js": b"document.body.dataset.ready='yes';",
             }
             meta = {"commit": COMMIT}
-            protected_before = receiver.protected_snapshot(root)
+            protected_before = self.receiver.protected_snapshot(root)
 
-            first = receiver.publish(meta, files, root=root, state=state)
-            second = receiver.publish(meta, files, root=root, state=state)
+            first = self.receiver.publish(meta, files, root=root, state=state)
+            second = self.receiver.publish(meta, files, root=root, state=state)
 
             self.assertTrue(first["protected_unchanged"])
             self.assertTrue(second["protected_unchanged"])
             self.assertEqual(first["protected_before"], first["protected_after"])
             self.assertEqual(second["protected_before"], second["protected_after"])
-            self.assertEqual(receiver.protected_snapshot(root), protected_before)
-            for protected in receiver.PROTECTED:
+            self.assertEqual(self.receiver.protected_snapshot(root), protected_before)
+            for protected in self.receiver.PROTECTED:
                 self.assertEqual((root / protected / "sentinel.txt").read_text(),
                                  protected + " sentinel")
             self.assertEqual((root / "unmanaged.txt").read_text(), "keep me")

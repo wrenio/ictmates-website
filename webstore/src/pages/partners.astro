@@ -1,9 +1,7 @@
 ---
 import '../styles/global.css';
 import '../styles/webstore.css';
-const formId = (import.meta.env.PUBLIC_UNSTATIC_FORM_ID || '').trim();
-const turnstileKey = (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '').trim();
-const emailEndpoint = formId ? `https://forms.un-static.com/forms/${formId}/ajax` : '';
+const web3formsKey = (import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY || '').trim();
 const faqs = [
   ['What is the difference between a reseller and an affiliate?', 'Resellers are technical professionals, agencies and IT businesses that help clients choose, set up and run online stores. Affiliates promote Webstore.pk through an audience, content or recommendations and introduce potential customers. Choose the route by the work you want to do, rather than your business title.'],
   ['What commission or margin will I receive?', 'Commission rates, reseller margins, eligibility and payment terms are still to be confirmed. Express your interest so we can discuss the proposed arrangement before you decide.'],
@@ -78,7 +76,7 @@ const faqs = [
       <section class="contact wrap" id="partner-contact">
         <div><div class="eyebrow">YOUR NEXT BUSINESS CONVERSATION</div><h2>Let’s explore<br />working together.</h2><p>Tell us a little about yourself and choose the role that fits your work. Send your enquiry by email, or prepare a message to share with ICT Mates on WhatsApp.</p><p class="partner-role-help">Choose <strong>reseller</strong> for technical client services, or <strong>affiliate</strong> for content and referrals.</p><div class="partner-direct"><p>Prefer a conversation? Call or WhatsApp ICT Mates.</p><a class="partner-phone" href="tel:+923005551575">+92 300 555 1575</a><a class="partner-reset text-link" href="https://wa.me/923005551575?text=Hello%20ICT%20Mates%2C%20please%20help%20me%20choose%20a%20Webstore.pk%20partner%20route." target="_blank" rel="noopener noreferrer">Chat on WhatsApp ↗︎</a></div></div>
         <div class="partner-form-panel">
-          <form id="partner-enquiry" aria-labelledby="enquiry-title" data-email-endpoint={emailEndpoint} data-turnstile-key={turnstileKey}>
+          <form id="partner-enquiry" aria-labelledby="enquiry-title" data-email-key={web3formsKey}>
             <div class="botcheck" aria-hidden="true"><label>Leave this field empty<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
             <h3 id="enquiry-title">Partner enquiry</h3>
             <p class="form-intro"><span class="required-mark" aria-hidden="true">*</span> Required fields. Choose email or WhatsApp below.</p>
@@ -95,7 +93,7 @@ const faqs = [
             <p id="partner-interest" class="form-status" aria-live="polite">Choose your partner route.</p>
             <div data-captcha></div><p class="form-status" data-captcha-status aria-live="polite"></p>
             <div class="enquiry-actions"><button class="button" type="submit" id="send-email" disabled aria-describedby="email-status">Send enquiry by email ↗︎</button><button class="button outline" type="submit" id="prepare-enquiry" disabled>Prepare WhatsApp message ↓</button></div>
-            <p id="email-status" class="form-status email-status" role="status">{emailEndpoint && turnstileKey ? 'Send your enquiry securely by email, or choose WhatsApp.' : 'Local preview: email delivery awaits connection. You can still use WhatsApp.'}</p>
+            <p id="email-status" class="form-status email-status" role="status">{web3formsKey ? 'Send your enquiry securely by email, or choose WhatsApp.' : 'Local preview: email delivery awaits connection. You can still use WhatsApp.'}</p>
             <noscript><p>Enable JavaScript to prepare your details, or <a href="https://wa.me/923005551575" target="_blank" rel="noopener noreferrer">contact ICT Mates on WhatsApp</a>.</p></noscript>
           </form>
           <div id="enquiry-preview" class="enquiry-preview" hidden>

@@ -12,14 +12,14 @@ test('email requires verification, handles API rejection, and consumes tokens on
   const status = { textContent: '' };
   const container = { clientWidth: 240 };
   const form = {
-    dataset: { emailEndpoint: `https://forms.un-static.com/forms/${'a'.repeat(40)}/ajax`, turnstileKey: 'test-site-key' },
+    dataset: { emailKey: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee' },
     querySelector: selector => selector === '[data-captcha]' ? container : captchaStatus,
   };
-  globalThis.window = { setTimeout, clearTimeout, turnstile: {
+  globalThis.window = { setTimeout, clearTimeout, hcaptcha: {
     render: (_container, options) => { callbacks = options; return 'widget'; },
     reset: () => { resetCount++; },
   } };
-  globalThis.document = { createElement: () => ({}), head: { append: value => { script = value; value.onload(); } } };
+  globalThis.document = { createElement: () => ({}), head: { append: value => { script = value; window.webstoreCaptchaReady(); } } };
   globalThis.FormData = class { get(key) { return values.get(key); } };
   globalThis.fetch = async (_url, options) => {
     requests.push(JSON.parse(options.body));
@@ -37,8 +37,11 @@ test('email requires verification, handles API rejection, and consumes tokens on
     values.set('website', '');
     await send('message', 'Store');
     assert.equal(requests.length, 1);
-    assert.equal(requests[0]['cf-turnstile-response'], 'verified-token');
+    assert.equal(requests[0]['h-captcha-response'], 'verified-token');
     assert.equal(requests[0].name, 'Test enquiry');
+    assert.equal(requests[0].subject, 'Store');
+    assert.equal(requests[0].access_key, form.dataset.emailKey);
+    assert.equal(requests[0].botcheck, false);
     assert.equal('email' in requests[0], false, 'Optional email remains optional');
     assert.match(status.textContent, /Thank you/);
     assert.ok(resetCount > 0);

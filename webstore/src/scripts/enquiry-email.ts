@@ -1,19 +1,20 @@
-type Turnstile = {
+type HCaptcha = {
   render: (container: HTMLElement, options: Record<string, unknown>) => string;
   reset: (id: string) => void;
 };
 
 /** Shared email delivery; WhatsApp preparation does not depend on this service. */
 export function setupEnquiryEmail(form: HTMLFormElement, button: HTMLButtonElement, status: HTMLElement) {
-  const endpoint = form.dataset.emailEndpoint || '';
-  const sitekey = form.dataset.turnstileKey || '';
+  const accessKey = form.dataset.emailKey || '';
+  // Web3Forms' public site key for its free hCaptcha integration.
+  const sitekey = '50b2fe65-b00b-4b9e-ad62-3ba471098be2';
   const container = form.querySelector<HTMLElement>('[data-captcha]');
   const captchaStatus = form.querySelector<HTMLElement>('[data-captcha-status]');
   let token = '';
   let widget: string | undefined;
   let sending = false;
-  const turnstile = () => (window as Window & { turnstile?: Turnstile }).turnstile;
-  const ready = /^https:\/\/forms\.un-static\.com\/forms\/[a-f0-9]{40}\/ajax$/.test(endpoint) && !!sitekey;
+  const captchaWindow = window as Window & { hcaptcha?: HCaptcha; webstoreCaptchaReady?: () => void };
+  const ready = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(accessKey);
   button.disabled = !ready;
 
   if (ready && container && captchaStatus) {
@@ -23,31 +24,31 @@ export function setupEnquiryEmail(form: HTMLFormElement, button: HTMLButtonEleme
       captchaStatus.textContent = 'Spam protection is unavailable. Reload to retry, or use WhatsApp.';
     };
     const script = document.createElement('script');
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    script.src = 'https://js.hcaptcha.com/1/api.js?onload=webstoreCaptchaReady&render=explicit&recaptchacompat=off';
     script.async = true;
     script.onerror = unavailable;
-    script.onload = () => {
+    captchaWindow.webstoreCaptchaReady = () => {
       try {
-        widget = turnstile()?.render(container, {
+        widget = captchaWindow.hcaptcha?.render(container, {
           sitekey,
           theme: 'light',
-          size: container.clientWidth < 300 ? 'compact' : 'flexible',
-          'response-field': false,
+          size: container.clientWidth < 304 ? 'compact' : 'normal',
           callback: (value: string) => {
             token = value;
             captchaStatus.textContent = 'Spam protection verified.';
           },
           'expired-callback': () => {
             token = '';
-            captchaStatus.textContent = 'Verification expired. Please wait for a fresh check or retry sending.';
+            captchaStatus.textContent = 'Verification expired. Please complete the check again.';
           },
-          'timeout-callback': () => {
+          'chalexpired-callback': () => {
             token = '';
             captchaStatus.textContent = 'Verification timed out. Please complete the check again.';
           },
           'error-callback': () => { unavailable(); return true; },
         });
         if (widget === undefined) unavailable();
+        else captchaStatus.textContent = 'Complete the spam-protection check to send by email.';
       } catch { unavailable(); }
     };
     document.head.append(script);
@@ -59,7 +60,7 @@ export function setupEnquiryEmail(form: HTMLFormElement, button: HTMLButtonEleme
     if (String(values.get('website') || '').trim()) return;
     if (!token) {
       status.textContent = 'Please complete the spam-protection check before sending by email. WhatsApp is also available.';
-      if (widget !== undefined) turnstile()?.reset(widget);
+      if (widget !== undefined) captchaWindow.hcaptcha?.reset(widget);
       return;
     }
     sending = true;
@@ -70,18 +71,20 @@ export function setupEnquiryEmail(form: HTMLFormElement, button: HTMLButtonEleme
     const timeout = window.setTimeout(() => controller.abort(), 20000);
     try {
       const email = String(values.get('email') || '').trim();
-      const response = await fetch(endpoint, {
+      const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         signal: controller.signal,
         redirect: 'error',
         body: JSON.stringify({
-          enquiry,
+          access_key: accessKey,
+          subject: enquiry,
+          from_name: 'Webstore.pk',
           name: String(values.get('name') || '').trim(),
           ...(email ? { email } : {}),
           message,
-          website: '',
-          'cf-turnstile-response': token,
+          botcheck: false,
+          'h-captcha-response': token,
         }),
       });
       const result = await response.json();
@@ -92,10 +95,11 @@ export function setupEnquiryEmail(form: HTMLFormElement, button: HTMLButtonEleme
     } finally {
       window.clearTimeout(timeout);
       token = '';
+      if (captchaStatus) captchaStatus.textContent = 'Complete the spam-protection check to send another enquiry.';
       sending = false;
       button.disabled = false;
       button.textContent = 'Send enquiry by email ↗︎';
-      if (widget !== undefined) turnstile()?.reset(widget);
+      if (widget !== undefined) captchaWindow.hcaptcha?.reset(widget);
     }
   };
 }

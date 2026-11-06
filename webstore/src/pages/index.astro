@@ -1,9 +1,7 @@
 ---
 import '../styles/global.css';
 import '../styles/webstore.css';
-const formId = (import.meta.env.PUBLIC_UNSTATIC_FORM_ID || '').trim();
-const turnstileKey = (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '').trim();
-const emailEndpoint = formId ? `https://forms.un-static.com/forms/${formId}/ajax` : '';
+const web3formsKey = (import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY || '').trim();
 const features = [
   ['store', 'Your store. Built to be found.', 'Your brand and your own storefront, optimized for search engines (SEO) and AI discovery (GEO). Start with a webstore.pk address or connect your own domain.'],
   ['sliders', 'AI help, in your admin', 'Generate product titles, descriptions, short descriptions and image alt text with built-in AI assistance. Review and refine the drafts while managing your products and orders.'],
@@ -100,7 +98,7 @@ const faqs = [
       <section class="contact wrap" id="contact">
         <div><div class="eyebrow">LET’S GET YOUR BUSINESS ONLINE</div><h2>Your shop’s next<br />chapter starts here.</h2><p>Tell us what you sell and what you have in mind. Send an email enquiry or prepare a WhatsApp message, and we’ll show you how Webstore.pk can work for your business.</p><div class="store-direct"><p>Prefer a conversation? Call or WhatsApp ICT Mates.</p><a class="store-phone" href="tel:+923005551575">+92 300 555 1575</a><a class="text-link" id="contact-whatsapp" href="https://wa.me/923005551575" target="_blank" rel="noopener noreferrer">Chat with us on WhatsApp ↗︎</a><p>Building 13, Block J, Gulberg III<br />Lahore, Pakistan</p></div></div>
         <div class="store-form-panel">
-          <form id="store-enquiry" aria-labelledby="store-enquiry-title" data-email-endpoint={emailEndpoint} data-turnstile-key={turnstileKey}>
+          <form id="store-enquiry" aria-labelledby="store-enquiry-title" data-email-key={web3formsKey}>
             <div class="botcheck" aria-hidden="true"><label>Leave this field empty<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
             <h3 id="store-enquiry-title">Tell us about your store</h3>
             <p class="form-intro"><span class="required-mark" aria-hidden="true">*</span> Required fields. Choose email or WhatsApp below.</p>
@@ -120,7 +118,7 @@ const faqs = [
             <p id="plan-interest" class="form-status" aria-live="polite">Ask for a walkthrough or tell us about your store.</p>
             <div data-captcha></div><p class="form-status" data-captcha-status aria-live="polite"></p>
             <div class="enquiry-actions"><button class="button" type="submit" id="send-store-email" disabled aria-describedby="store-email-status">Send enquiry by email ↗︎</button><button class="button outline" type="submit" id="prepare-store-enquiry" disabled>Prepare WhatsApp message ↓</button></div>
-            <p id="store-email-status" class="form-status" role="status">{emailEndpoint && turnstileKey ? 'Send your enquiry securely by email, or choose WhatsApp.' : 'Local preview: email delivery awaits connection. You can still use WhatsApp.'}</p>
+            <p id="store-email-status" class="form-status" role="status">{web3formsKey ? 'Send your enquiry securely by email, or choose WhatsApp.' : 'Local preview: email delivery awaits connection. You can still use WhatsApp.'}</p>
             <noscript><p>Enable JavaScript to send your enquiry, or <a href="https://wa.me/923005551575" target="_blank" rel="noopener noreferrer">contact ICT Mates on WhatsApp</a>.</p></noscript>
           </form>
           <div id="store-enquiry-preview" class="enquiry-preview" hidden><h4>Your WhatsApp message</h4><p id="store-enquiry-message"></p><a class="button" id="store-whatsapp" target="_blank" rel="noopener noreferrer">Open WhatsApp ↗︎</a><p class="send-note">Preparing this message does not send it. Opening WhatsApp shares these details with WhatsApp; you choose when to send it to ICT Mates.</p></div>

@@ -1,7 +1,9 @@
 ---
 import '../styles/global.css';
 import '../styles/webstore.css';
-const web3formsKey = (import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY || '').trim();
+const formId = (import.meta.env.PUBLIC_UNSTATIC_FORM_ID || '').trim();
+const turnstileKey = (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '').trim();
+const emailEndpoint = formId ? `https://forms.un-static.com/forms/${formId}/ajax` : '';
 const features = [
   ['store', 'Your store. Built to be found.', 'Your brand and your own storefront, optimized for search engines (SEO) and AI discovery (GEO). Start with a webstore.pk address or connect your own domain.'],
   ['sliders', 'AI help, in your admin', 'Generate product titles, descriptions, short descriptions and image alt text with built-in AI assistance. Review and refine the drafts while managing your products and orders.'],
@@ -98,8 +100,8 @@ const faqs = [
       <section class="contact wrap" id="contact">
         <div><div class="eyebrow">LET’S GET YOUR BUSINESS ONLINE</div><h2>Your shop’s next<br />chapter starts here.</h2><p>Tell us what you sell and what you have in mind. Send an email enquiry or prepare a WhatsApp message, and we’ll show you how Webstore.pk can work for your business.</p><div class="store-direct"><p>Prefer a conversation? Call or WhatsApp ICT Mates.</p><a class="store-phone" href="tel:+923005551575">+92 300 555 1575</a><a class="text-link" id="contact-whatsapp" href="https://wa.me/923005551575" target="_blank" rel="noopener noreferrer">Chat with us on WhatsApp ↗︎</a><p>Building 13, Block J, Gulberg III<br />Lahore, Pakistan</p></div></div>
         <div class="store-form-panel">
-          <form id="store-enquiry" aria-labelledby="store-enquiry-title" data-email-key={web3formsKey}>
-            <input type="checkbox" name="botcheck" tabindex="-1" aria-hidden="true" class="botcheck" />
+          <form id="store-enquiry" aria-labelledby="store-enquiry-title" data-email-endpoint={emailEndpoint} data-turnstile-key={turnstileKey}>
+            <div class="botcheck" aria-hidden="true"><label>Leave this field empty<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
             <h3 id="store-enquiry-title">Tell us about your store</h3>
             <p class="form-intro"><span class="required-mark" aria-hidden="true">*</span> Required fields. Choose email or WhatsApp below.</p>
             <div class="form-fields">
@@ -116,8 +118,9 @@ const faqs = [
               <div class="form-field"><label for="store-message">What do you have in mind? <span class="optional-label">(optional)</span></label><textarea id="store-message" name="message" rows="3" maxlength="2000" placeholder="What you sell, a walkthrough, or help with an existing store…"></textarea></div>
             </div>
             <p id="plan-interest" class="form-status" aria-live="polite">Ask for a walkthrough or tell us about your store.</p>
+            <div data-captcha></div><p class="form-status" data-captcha-status aria-live="polite"></p>
             <div class="enquiry-actions"><button class="button" type="submit" id="send-store-email" disabled aria-describedby="store-email-status">Send enquiry by email ↗︎</button><button class="button outline" type="submit" id="prepare-store-enquiry" disabled>Prepare WhatsApp message ↓</button></div>
-            <p id="store-email-status" class="form-status" role="status">{web3formsKey ? 'Email enquiries are sent through Web3Forms to ICT Mates.' : 'Local preview: email delivery awaits connection. You can still use WhatsApp.'}</p>
+            <p id="store-email-status" class="form-status" role="status">{emailEndpoint && turnstileKey ? 'Send your enquiry securely by email, or choose WhatsApp.' : 'Local preview: email delivery awaits connection. You can still use WhatsApp.'}</p>
             <noscript><p>Enable JavaScript to send your enquiry, or <a href="https://wa.me/923005551575" target="_blank" rel="noopener noreferrer">contact ICT Mates on WhatsApp</a>.</p></noscript>
           </form>
           <div id="store-enquiry-preview" class="enquiry-preview" hidden><h4>Your WhatsApp message</h4><p id="store-enquiry-message"></p><a class="button" id="store-whatsapp" target="_blank" rel="noopener noreferrer">Open WhatsApp ↗︎</a><p class="send-note">Preparing this message does not send it. Opening WhatsApp shares these details with WhatsApp; you choose when to send it to ICT Mates.</p></div>
@@ -126,6 +129,7 @@ const faqs = [
     </main>
     <footer class="wrap footer"><a class="logo" href="#"><img src="/webstore-logo.webp" alt="Webstore.pk" width="600" height="132" loading="lazy" /></a><p>Your business. Your online store.</p><nav aria-label="Footer navigation"><a href="#pricing">Pricing</a><a href="#faq">FAQs</a><a href="/partners/">Partners</a><a href="/login/">Store login</a><a href="#contact">Contact</a></nav><div class="footer-bottom"><span>© {new Date().getFullYear()} Webstore.pk · A service by ICT Mates.</span><span>Powered by <a href="https://wreniocommerce.com/" target="_blank" rel="noopener noreferrer">Wrenio Commerce</a> · Built by <a href="https://wrenio.studio/" target="_blank" rel="noopener noreferrer">Wrenio Studio</a></span></div></footer>
     <script>
+      import { setupEnquiryEmail } from '../scripts/enquiry-email';
       const form = document.querySelector<HTMLFormElement>('#store-enquiry');
       const plan = document.querySelector<HTMLSelectElement>('#store-plan');
       const status = document.querySelector<HTMLParagraphElement>('#plan-interest');
@@ -137,11 +141,9 @@ const faqs = [
       const whatsapp = document.querySelector<HTMLAnchorElement>('#store-whatsapp');
       const directWhatsapp = document.querySelector<HTMLAnchorElement>('#contact-whatsapp');
       if (form && plan && status && emailStatus && sendEmail && prepare && preview && messageText && whatsapp) {
-        const accessKey = form.dataset.emailKey || '';
+        const deliverEmail = setupEnquiryEmail(form, sendEmail, emailStatus);
         const planLabels: Record<string, string> = { undecided: 'Help me choose', monthly: 'Monthly — Rs. 3,000/month', annual: 'Annual — Rs. 30,000/year' };
-        let sending = false;
         prepare.disabled = false;
-        sendEmail.disabled = !accessKey;
         const invalidateMessage = () => {
           const wasPrepared = !preview.hidden;
           preview.hidden = true;
@@ -182,31 +184,7 @@ const faqs = [
             '', note || 'Please contact me about setting up my online store.',
           ].join('\n');
           if ((event as SubmitEvent).submitter !== prepare) {
-            if (!accessKey || sending || values.get('botcheck')) return;
-            sending = true;
-            sendEmail.disabled = true;
-            sendEmail.textContent = 'Sending…';
-            emailStatus.textContent = 'Sending your enquiry by email…';
-            const controller = new AbortController();
-            const timeout = window.setTimeout(() => controller.abort(), 20000);
-            try {
-              const response = await fetch('https://api.web3forms.com/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                signal: controller.signal,
-                body: JSON.stringify({ access_key: accessKey, subject: 'Webstore.pk webshop enquiry', from_name: 'Webstore.pk', name: String(values.get('name')).trim(), ...(email ? { email } : {}), message, botcheck: false }),
-              });
-              const result = await response.json();
-              if (!response.ok || result.success !== true) throw new Error('Submission not confirmed');
-              emailStatus.textContent = 'Thank you. Your enquiry has been sent by email to ICT Mates. We’ll contact you using the details you provided.';
-            } catch {
-              emailStatus.textContent = 'We couldn’t confirm email delivery. Your details are still here. Please try again later or use WhatsApp instead.';
-            } finally {
-              window.clearTimeout(timeout);
-              sending = false;
-              sendEmail.disabled = false;
-              sendEmail.textContent = 'Send enquiry by email ↗︎';
-            }
+            await deliverEmail(message, 'Webstore.pk webshop enquiry');
             return;
           }
           messageText.textContent = message;
@@ -241,7 +219,8 @@ const faqs = [
   .store-form-panel .button { width:100%; min-height:44px; padding:12px 16px; font-family:inherit; cursor:pointer; gap:10px; }
   .store-form-panel button:disabled { cursor:not-allowed; opacity:.6; }
   .enquiry-actions { display:grid; gap:8px; }
-  .botcheck { display:none; }
+  .botcheck { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+  [data-captcha] { margin:12px 0 6px; }
   .enquiry-preview { margin-top:24px; padding-top:22px; border-top:2px solid var(--teal-bright); }
   .enquiry-preview[hidden] { display:none; }
   .enquiry-preview h4 { margin:0 0 12px; font-size:16px; }

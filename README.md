@@ -40,26 +40,42 @@ project root in PowerShell, set `$env:ASTRO_TELEMETRY_DISABLED = '1'`, then run
 serves that build. The existing ICTmates build and deployment remain separate.
 
 The `/partners/` page includes required name, business/creator, city, phone and partner-type fields, plus optional email, in its
-enquiry form. Visitors can send an email through Web3Forms or prepare a WhatsApp
-message to review before opening WhatsApp. Editing the fields clears the prepared
-WhatsApp link until the message is regenerated. No enquiry is stored by this site.
+enquiry form. Visitors can send an email through Un-static or prepare a WhatsApp
+message to review before opening WhatsApp. Editing fields clears the prepared link.
+The site does not store enquiries; Un-static processes and retains submissions
+according to the account plan.
 
-To enable email delivery locally, create `webstore/.env.local` (ignored by Git) with
-`PUBLIC_WEB3FORMS_ACCESS_KEY=your_access_key`, using a Web3Forms key linked to the
-intended receiving inbox. Restart the dev server after configuring it; static
-builds require the key at build time. This is a public form access key, rendered
-into the page as intended by Web3Forms, not an email password or private API token.
-Without a key, email submission stays disabled and WhatsApp remains available.
-With a key, clicking Send enquiry by email makes a real Web3Forms request even on
-localhost. Optional visitor email is used for replies; phone remains required.
-The form keeps entered details on failure and reports success only after API
-confirmation. Inbox receipt must still be checked when activating the connection.
+Both forms share a linked Un-static endpoint delivering to `azeem@ictmates.com`.
+The `enquiry` field identifies store versus partner enquiries. In Un-static, select
+Cloudflare Turnstile, save the widget's **secret only**, set `website` as the
+honeypot field, and `email` as the Reply To field. Keep the optional captcha site
+key unset there: the widget runs on Webstore.pk, not on a hosted protection page.
+Never put the verification secret in source, public environment variables,
+GitHub build settings, or browser code.
 
-The homepage contact form uses the same Web3Forms key and offers WhatsApp as an
-alternative. It collects name, business, city and phone, with optional email and
-message. Pricing buttons select the monthly or annual plan in the form; both
-email and WhatsApp enquiries include that preference. Homepage email enquiries
-use the subject `Webstore.pk webshop enquiry` to distinguish them from partners.
+Local configuration in ignored `webstore/.env.local`:
+
+```dotenv
+PUBLIC_UNSTATIC_FORM_ID=your_form_reference
+PUBLIC_TURNSTILE_SITE_KEY=your_public_site_key
+```
+
+Restart the dev server after configuration. These public identifiers are embedded
+at build time. Without both, email is disabled while WhatsApp works. The production
+widget permits `webstore.pk` (including www), not localhost. Use Cloudflare's test
+keys and mocked delivery for local checks; never pair test secrets with production
+Un-static. Real email checks need the production hostname and a valid token.
+Missing, invalid and reused tokens must be rejected before release acceptance.
+
+The email helper retains entered details on errors, prevents duplicate in-flight
+submissions, and resets the single-use token after each attempt. Optional visitor
+email is used for replies; phone remains required. Verify inbox receipt when
+activating or changing delivery.
+
+The homepage collects name, business, city and phone, with optional email and
+message. Pricing buttons select the monthly or annual plan; email and WhatsApp
+include that preference. WhatsApp preparation does not require Turnstile and
+never sends a message automatically.
 
 Webstore.pk uses its own SiteGround account, document root
 `/home/customer/www/webstore.pk/public_html`, and GitHub environment
@@ -72,8 +88,8 @@ ignores only Cloudflare's recognized injected analytics script, matching the
 existing ICTmates verification approach.
 
 The environment contains `SITEGROUND_DEPLOY_KEY` (a dedicated Webstore-only key)
-and `PUBLIC_WEB3FORMS_ACCESS_KEY` (the public form key linked to the approved
-receiving inbox). The SSH host is pinned in `ops/webstore_siteground_known_hosts`.
+and the public environment variables `PUBLIC_UNSTATIC_FORM_ID` and
+`PUBLIC_TURNSTILE_SITE_KEY`. The SSH host is pinned in `ops/webstore_siteground_known_hosts`.
 The installed receiver must match `ops/deploy_webstore_receiver.py`. It lives at
 `/home/customer/.webstore-deploy/deploy_receiver.py`; overwritten files and
 receipts are retained outside the web root under the same state directory.

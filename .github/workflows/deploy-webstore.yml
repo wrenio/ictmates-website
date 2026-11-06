@@ -22,7 +22,8 @@ jobs:
       url: https://webstore.pk
     env:
       ASTRO_TELEMETRY_DISABLED: '1'
-      PUBLIC_WEB3FORMS_ACCESS_KEY: ${{ secrets.PUBLIC_WEB3FORMS_ACCESS_KEY }}
+      PUBLIC_UNSTATIC_FORM_ID: ${{ vars.PUBLIC_UNSTATIC_FORM_ID }}
+      PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -35,10 +36,14 @@ jobs:
           cache: npm
       - name: Test deployment protections
         run: python3 -m unittest discover -s tests -v
+      - name: Test enquiry delivery protections
+        run: node --test tests/enquiry-email.test.mjs
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
       - name: Check form configuration
-        run: test -n "$PUBLIC_WEB3FORMS_ACCESS_KEY"
+        run: |
+          test -n "$PUBLIC_UNSTATIC_FORM_ID"
+          test -n "$PUBLIC_TURNSTILE_SITE_KEY"
       - name: Build static website
         run: npm run build:webstore
       - name: Package release

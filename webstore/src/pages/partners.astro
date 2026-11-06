@@ -1,7 +1,9 @@
 ---
 import '../styles/global.css';
 import '../styles/webstore.css';
-const web3formsKey = (import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY || '').trim();
+const formId = (import.meta.env.PUBLIC_UNSTATIC_FORM_ID || '').trim();
+const turnstileKey = (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '').trim();
+const emailEndpoint = formId ? `https://forms.un-static.com/forms/${formId}/ajax` : '';
 const faqs = [
   ['What is the difference between a reseller and an affiliate?', 'Resellers are technical professionals, agencies and IT businesses that help clients choose, set up and run online stores. Affiliates promote Webstore.pk through an audience, content or recommendations and introduce potential customers. Choose the route by the work you want to do, rather than your business title.'],
   ['What commission or margin will I receive?', 'Commission rates, reseller margins, eligibility and payment terms are still to be confirmed. Express your interest so we can discuss the proposed arrangement before you decide.'],
@@ -76,8 +78,8 @@ const faqs = [
       <section class="contact wrap" id="partner-contact">
         <div><div class="eyebrow">YOUR NEXT BUSINESS CONVERSATION</div><h2>Let’s explore<br />working together.</h2><p>Tell us a little about yourself and choose the role that fits your work. Send your enquiry by email, or prepare a message to share with ICT Mates on WhatsApp.</p><p class="partner-role-help">Choose <strong>reseller</strong> for technical client services, or <strong>affiliate</strong> for content and referrals.</p><div class="partner-direct"><p>Prefer a conversation? Call or WhatsApp ICT Mates.</p><a class="partner-phone" href="tel:+923005551575">+92 300 555 1575</a><a class="partner-reset text-link" href="https://wa.me/923005551575?text=Hello%20ICT%20Mates%2C%20please%20help%20me%20choose%20a%20Webstore.pk%20partner%20route." target="_blank" rel="noopener noreferrer">Chat on WhatsApp ↗︎</a></div></div>
         <div class="partner-form-panel">
-          <form id="partner-enquiry" aria-labelledby="enquiry-title" data-email-key={web3formsKey}>
-            <input type="checkbox" name="botcheck" tabindex="-1" aria-hidden="true" class="botcheck" />
+          <form id="partner-enquiry" aria-labelledby="enquiry-title" data-email-endpoint={emailEndpoint} data-turnstile-key={turnstileKey}>
+            <div class="botcheck" aria-hidden="true"><label>Leave this field empty<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
             <h3 id="enquiry-title">Partner enquiry</h3>
             <p class="form-intro"><span class="required-mark" aria-hidden="true">*</span> Required fields. Choose email or WhatsApp below.</p>
             <div class="form-fields">
@@ -91,8 +93,9 @@ const faqs = [
             </div>
             <fieldset><legend>I’m interested in <span class="required-mark" aria-hidden="true">*</span></legend><div class="role-options"><label><input type="radio" name="partner_type" value="reseller" required /> Reseller</label><label><input type="radio" name="partner_type" value="affiliate" required /> Affiliate</label></div></fieldset>
             <p id="partner-interest" class="form-status" aria-live="polite">Choose your partner route.</p>
+            <div data-captcha></div><p class="form-status" data-captcha-status aria-live="polite"></p>
             <div class="enquiry-actions"><button class="button" type="submit" id="send-email" disabled aria-describedby="email-status">Send enquiry by email ↗︎</button><button class="button outline" type="submit" id="prepare-enquiry" disabled>Prepare WhatsApp message ↓</button></div>
-            <p id="email-status" class="form-status email-status" role="status">{web3formsKey ? 'Email enquiries are sent through Web3Forms to ICT Mates.' : 'Local preview: email delivery awaits connection. You can still use WhatsApp.'}</p>
+            <p id="email-status" class="form-status email-status" role="status">{emailEndpoint && turnstileKey ? 'Send your enquiry securely by email, or choose WhatsApp.' : 'Local preview: email delivery awaits connection. You can still use WhatsApp.'}</p>
             <noscript><p>Enable JavaScript to prepare your details, or <a href="https://wa.me/923005551575" target="_blank" rel="noopener noreferrer">contact ICT Mates on WhatsApp</a>.</p></noscript>
           </form>
           <div id="enquiry-preview" class="enquiry-preview" hidden>
@@ -105,6 +108,7 @@ const faqs = [
     </main>
     <footer class="wrap footer"><a class="logo" href="/" aria-label="Webstore.pk home"><img src="/webstore-logo.webp" alt="Webstore.pk" width="600" height="132" loading="lazy" /></a><p>Your business. Your online store.</p><nav aria-label="Footer navigation"><a href="/">Webshops</a><a href="/#pricing">Pricing</a><a href="/partners/" aria-current="page">Partners</a><a href="/login/">Store login</a></nav><div class="footer-bottom"><span>© {new Date().getFullYear()} Webstore.pk · A service by <a href="https://ictmates.com/" target="_blank" rel="noopener noreferrer">ICT Mates</a>.</span><span>Powered by <a href="https://wreniocommerce.com/" target="_blank" rel="noopener noreferrer">Wrenio Commerce</a> · Built by <a href="https://wrenio.studio/" target="_blank" rel="noopener noreferrer">Wrenio Studio</a></span></div></footer>
     <script>
+      import { setupEnquiryEmail } from '../scripts/enquiry-email';
       const form = document.querySelector<HTMLFormElement>('#partner-enquiry');
       const preview = document.querySelector<HTMLDivElement>('#enquiry-preview');
       const messageText = document.querySelector<HTMLParagraphElement>('#enquiry-message');
@@ -114,9 +118,7 @@ const faqs = [
       const sendEmail = document.querySelector<HTMLButtonElement>('#send-email');
       const emailStatus = document.querySelector<HTMLParagraphElement>('#email-status');
       if (form && preview && messageText && whatsapp && status && prepare && sendEmail && emailStatus) {
-        const accessKey = form.dataset.emailKey || '';
-        let sending = false;
-        sendEmail.disabled = !accessKey;
+        const deliverEmail = setupEnquiryEmail(form, sendEmail, emailStatus);
         prepare.disabled = false;
         const invalidateMessage = () => {
           const wasPrepared = !preview.hidden;
@@ -160,41 +162,7 @@ const faqs = [
             'Please share the proposed programme details and terms.',
           ].join('\n');
           if ((event as SubmitEvent).submitter !== prepare) {
-            if (!accessKey || sending) return;
-            if (values.get('botcheck')) return;
-            sending = true;
-            sendEmail.disabled = true;
-            sendEmail.textContent = 'Sending…';
-            emailStatus.textContent = 'Sending your enquiry by email…';
-            const controller = new AbortController();
-            const timeout = window.setTimeout(() => controller.abort(), 20000);
-            try {
-              const email = String(values.get('email')).trim();
-              const response = await fetch('https://api.web3forms.com/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                signal: controller.signal,
-                body: JSON.stringify({
-                  access_key: accessKey,
-                  subject: `Webstore.pk partner enquiry — ${role}`,
-                  from_name: 'Webstore.pk Partners',
-                  name: String(values.get('name')).trim(),
-                  ...(email ? { email } : {}),
-                  message,
-                  botcheck: false,
-                }),
-              });
-              const result = await response.json();
-              if (!response.ok || result.success !== true) throw new Error('Submission not confirmed');
-              emailStatus.textContent = 'Thank you. Your enquiry has been sent by email to ICT Mates. We’ll contact you using the details you provided.';
-            } catch {
-              emailStatus.textContent = 'We couldn’t confirm email delivery. Your details are still here. Please try again later or use WhatsApp instead.';
-            } finally {
-              window.clearTimeout(timeout);
-              sending = false;
-              sendEmail.disabled = false;
-              sendEmail.textContent = 'Send enquiry by email ↗︎';
-            }
+            await deliverEmail(message, `Webstore.pk partner enquiry — ${role}`);
             return;
           }
           messageText.textContent = message;
@@ -265,7 +233,8 @@ const faqs = [
   .partner-form-panel .button { width:100%; min-height:44px; padding:12px 16px; font-family:inherit; cursor:pointer; gap:10px; }
   .partner-form-panel button:disabled { cursor:not-allowed; opacity:.6; }
   .enquiry-actions { display:grid; gap:8px; }
-  .botcheck { display:none; }
+  .botcheck { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+  [data-captcha] { margin:12px 0 6px; }
   .partner-form-panel .email-status { margin:10px 0 0; }
   .enquiry-preview { margin-top:24px; padding-top:22px; border-top:2px solid var(--teal-bright); }
   .enquiry-preview[hidden] { display:none; }

@@ -1,6 +1,6 @@
-# ICTmates website
+# ICT Mates website
 
-A static Astro marketing website for ICTmates and Wrenio Commerce, designed for SiteGround hosting.
+A static Astro marketing website for ICT Mates and Wrenio Commerce, designed for SiteGround hosting.
 
 ## Repository and live site
 
@@ -33,11 +33,11 @@ npm run dev
 ### Webstore.pk
 
 The separate Webstore.pk marketing website is in `webstore/`. It reuses the existing
-Astro dependency and copies the ICTmates design as its starting point. From the
+Astro dependency and copies the ICT Mates design as its starting point. From the
 project root in PowerShell, set `$env:ASTRO_TELEMETRY_DISABLED = '1'`, then run
 `npm run dev:webstore` for the local preview at `http://127.0.0.1:4322`.
 `npm run build:webstore` generates `webstore/dist/`; `npm run preview:webstore`
-serves that build. The existing ICTmates build and deployment remain separate.
+serves that build. The existing ICT Mates build and deployment remain separate.
 
 The homepage and `/partners/` forms send enquiries to `azeem@ictmates.com` through
 `/api/enquiry.php`, using authenticated SiteGround SMTP from `website@webstore.pk`.
@@ -100,7 +100,7 @@ protection tests, packages checksummed pages and the exact approved PHP files, p
 forced-command receiver, flushes SiteGround caching, and verifies all generated
 pages and assets on both `webstore.pk` and `www.webstore.pk`. Public verification
 ignores only Cloudflare's recognized injected analytics script, matching the
-existing ICTmates verification approach.
+existing ICT Mates verification approach.
 
 The environment contains `SITEGROUND_DEPLOY_KEY` (a dedicated Webstore-only key)
 and `PUBLIC_TURNSTILE_SITE_KEY` (the public widget identifier, stored as an
@@ -110,10 +110,10 @@ The installed receiver must match `ops/deploy_webstore_receiver.py`. It lives at
 receipts are retained outside the web root under the same state directory.
 The existing `Default.html`, `.well-known`, and other unmanaged files are preserved.
 A protected folder that does not exist is recorded as absent and must remain so.
-The independent ICTmates receiver and its destination are unchanged. Webstore's
+ICT Mates uses its own independent receiver and destination. Webstore's
 receiver permits only four specific PHP paths: `api/enquiry.php` and the three
 PHPMailer classes. Other executable paths remain forbidden. Package Webstore with
-`ops/build_release.py --webstore`; the default packager remains static-only.
+`ops/build_release.py --webstore`; the default packager uses the ICT Mates receiver’s separate allowlist.
 Install receiver changes through authorized SSH before releasing them. Source hashes
 are checked on the server; public verification checks PHP execution instead of
 requesting its source.
@@ -121,7 +121,7 @@ requesting its source.
 Public homepage and partner pages permit indexing and are listed in `sitemap.xml`.
 The `/login/` page provides store-access guidance and remains excluded from indexing;
 each client receives its own admin URL. It does not implement authentication.
-The final supplied WebP logo is unchanged; the page pairs ICTmates blue with teal accents.
+The final supplied WebP logo is unchanged; the page pairs ICT Mates blue with teal accents.
 
 Cloudflare proxies the marketing apex and www records, with Full (strict) TLS,
 HTTPS redirection, HTTP/2 and HTTP/3. Smart Tiered Cache is enabled. Static assets
@@ -131,7 +131,7 @@ and email DNS records are unchanged. Do not enable a zone-wide Cache Everything 
 marketing rules to client subdomains. CSS and JavaScript build filenames are hashed;
 version image/font filenames when changing their contents, or purge the changed URLs.
 
-### ICTmates
+### ICT Mates
 
 ```sh
 export ASTRO_TELEMETRY_DISABLED=1
@@ -139,7 +139,33 @@ npm run build
 npm run preview
 ```
 
-The static website is generated in `dist/`. There is no application server or database required for deployment. DM Sans and Manrope are served locally as variable WOFF2 fonts from `public/fonts/`, with early preloads and system fallbacks while loading. The Latin subsets retain the site's existing font weights; their SIL Open Font License files are included alongside them. No Google Fonts requests are needed at runtime.
+The static website is generated in `dist/`. SiteGround serves the static pages and runs the PHP enquiry endpoint. There is no database. DM Sans and Manrope are served locally as variable WOFF2 fonts from `public/fonts/`, with early preloads and system fallbacks while loading. The Latin subsets retain the site's existing font weights; their SIL Open Font License files are included alongside them. No Google Fonts requests are needed at runtime.
+
+### ICT Mates contact and partner enquiries
+
+The `/contact/` and `/partners/` forms submit email to `/api/enquiry.php`. Each form has its own Cloudflare Turnstile action, checked server-side before email is sent. The
+recipient is `azeem@ictmates.com`. The visitor’s optional email is used only as
+Reply-To. WhatsApp preparation is independent and the local Astro preview does
+not send email.
+
+Before release, set `PUBLIC_TURNSTILE_SITE_KEY` in the GitHub `production`
+environment for a widget authorised for `ictmates.com` and `www.ictmates.com`.
+On the ICT Mates SiteGround account, configure the private file
+`/home/customer/.ictmates-forms/config.json` (0600, parent directory 0700) with
+`turnstile_secret`, `smtp_host` and `smtp_password`. Both forms authenticate and
+send as `admin@ictmates.com` through `ams17.siteground.eu` over TLS on port
+465, using the password for that SiteGround mailbox. Keep credentials outside
+the repository and public web root. The
+endpoint needs PHP 8.1+ with curl, mbstring and openssl. Quota state contains
+only timestamps and token hashes.
+
+Install the reviewed ICT Mates receiver through the documented SSH route before
+pushing the approved release. The receiver permits exactly `api/enquiry.php`
+and the three PHPMailer source files under `api/mail/`. GitHub Actions checks
+that PHP rejects GET and verifies both form pages on both hostnames. Confirm
+live email receipt with a labelled enquiry after release. Local checks are
+`node --test tests/ictmates-enquiry-email.test.mjs` and
+`php tests/ictmates-enquiry-handler.test.php`.
 
 ## SiteGround deployment
 
@@ -151,7 +177,7 @@ No production files were changed during recovery. Automatic deployment from `mai
 
 Every push to `main` runs [Deploy website to SiteGround](https://github.com/wrenio/ictmates-website/actions/workflows/deploy-siteground.yml). It can also be rerun manually with **Run workflow** on `main`. No manual approval is required. Other branches do not deploy.
 
-The workflow runs deployment protection tests, installs the locked dependencies with `npm ci`, builds with Node.js 24, and packages only generated static files. Deployments are serialized so one release cannot interrupt another. The receiver flushes SiteGround's dynamic cache and verifies both HTTPS homepages. The workflow then purges the public HTML URLs from Cloudflare and verifies both pages on both hostnames against the build.
+The workflow runs deployment protection tests, installs the locked dependencies with `npm ci`, builds with Node.js 24, and packages the generated static files and the allowlisted enquiry scripts. Deployments are serialized so one release cannot interrupt another. The receiver flushes SiteGround's dynamic cache and verifies both HTTPS homepages. The workflow then purges the public HTML URLs from Cloudflare and verifies all four pages on both hostnames against the build.
 
 ### Cloudflare and SiteGround caching
 
@@ -167,7 +193,7 @@ The two cache layers can coexist. The important order is **publish files → flu
 
 A dedicated key is stored in the GitHub `production` environment as `SITEGROUND_DEPLOY_KEY`, restricted to the `main` branch. The runner creates its own `sg_ictmates` SSH alias and verifies the pinned ED25519 host key in `ops/siteground_known_hosts`. Your Windows personal key is not stored in GitHub.
 
-On SiteGround, the key is restricted to `/home/customer/.ictmates-deploy/deploy_receiver.py`; it cannot run arbitrary shell commands or forward connections. The receiver rejects protected paths, hidden paths, traversal, symlinks, and executable server-side files. It publishes assets before `index.html`, retains older hashed assets, and never recursively synchronizes or deletes website directories. `WP old website`, `.well-known`, and unrelated files are preserved. Before/after metadata checks cover the protected directories.
+On SiteGround, the key is restricted to `/home/customer/.ictmates-deploy/deploy_receiver.py`; it cannot run arbitrary shell commands or forward connections. The receiver rejects protected paths, hidden paths, traversal, symlinks, and executable server-side files outside the exact enquiry handler allowlist. It publishes assets before `index.html`, retains older hashed assets, and never recursively synchronizes or deletes website directories. `WP old website`, `.well-known`, and unrelated files are preserved. Before/after metadata checks cover the protected directories.
 
 The installed receiver must match `ops/deploy_receiver.py` in the checkout; the workflow fails safely if these differ. A receiver update requires installing the reviewed script using the owner's existing SSH connection. Previous overwritten static files and deployment receipts are retained outside the web root under `/home/customer/.ictmates-deploy/releases/`.
 
@@ -182,7 +208,7 @@ Before launch, inventory the existing WordPress URLs and configure redirects for
 - The one-page A4 customer flyer is served from `public/downloads/wrenio-commerce-flyer.pdf`. Keep its offer and comparison assumptions aligned with the comparison page.
 - Edit the visual design in `src/styles/global.css`.
 - Pricing buttons lead to the contact section and identify the selected plan.
-- The contact button opens WhatsApp for +92 300 555 1575 in a new tab. Pricing buttons prefill the selected plan in the WhatsApp message. No message is sent automatically, and no form submission or checkout is implemented.
+- The contact button opens WhatsApp for +92 300 555 1575 in a new tab. Pricing buttons prefill the selected plan in the WhatsApp message. WhatsApp messages are sent only when the visitor sends them. Contact and partner email enquiries use their respective forms.
 - The storefront in the hero is an original CSS illustration, not a screenshot or promise of a specific theme.
 - No subscription is purchased and no seller account is created on this marketing site.
 

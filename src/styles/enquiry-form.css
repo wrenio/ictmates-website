@@ -1,0 +1,18 @@
+.botcheck { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+[data-captcha]:empty + [data-captcha-status]:empty { display:none; }
+.enquiry-panel { background:#fff; color:var(--ink); padding:24px; border-radius:16px; min-width:0; box-shadow:var(--shadow-card); }
+.enquiry-panel h3 { font-size:24px; margin:0 0 8px; }
+.enquiry-panel .form-intro,.enquiry-panel .form-status,.enquiry-panel .send-note { color:var(--muted); font-size:12px; margin:0 0 12px; }
+.form-fields { display:grid; gap:10px; }
+.form-field label,.enquiry-panel legend { display:block; font-size:13px; font-weight:600; margin-bottom:4px; }
+.required-mark { color:#b42318; }
+.optional-label { font-weight:400; color:var(--muted); }
+.form-field input,.form-field textarea { display:block; width:100%; min-width:0; min-height:44px; border:1px solid #b9c3e3; border-radius:6px; padding:8px 10px; font:inherit; font-size:16px; color:var(--ink); background:#fafbff; }
+.enquiry-panel :is(input,textarea,button):focus-visible { outline:3px solid #bf670e; outline-offset:3px; }
+.enquiry-panel .button { width:100%; min-height:44px; padding:12px 16px; font-family:inherit; cursor:pointer; gap:10px; }
+.enquiry-panel button:disabled { cursor:not-allowed; opacity:.6; }
+.enquiry-actions { display:grid; gap:8px; }
+.enquiry-panel .send-note { margin:14px 0 0; }
+.enquiry-panel .email-status { margin:12px 0 0; }
+.form-field textarea { resize:vertical; }
+@media(max-width:720px) { .enquiry-panel { padding:22px 18px; } }

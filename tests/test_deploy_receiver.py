@@ -40,6 +40,18 @@ class ReadPackageTests(unittest.TestCase):
         with self.assertRaises((ValueError, OSError)):
             self.receiver.read_package(payload)
 
+    def test_accepts_only_the_named_php_files(self):
+        allowed = ('api/enquiry.php', 'api/mail/Exception.php',
+                   'api/mail/PHPMailer.php', 'api/mail/SMTP.php')
+        _, files = self.receiver.read_package(package_bytes({
+            'index.html': b'home', **dict.fromkeys(allowed, b'<?php'),
+        }))
+        self.assertTrue(set(allowed) <= files.keys())
+        for name in ('evil.php', 'api/config.php', 'api/Enquiry.php',
+                     'nested/api/enquiry.php', 'api/mail/other.php'):
+            with self.subTest(name=name):
+                self.assert_rejected(package_bytes({'index.html': b'home', name: b'<?php'}))
+
     def test_rejects_protected_paths_case_insensitively(self):
         for name in (
             "WP old website/index.html",

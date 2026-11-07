@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <symbol id="store" viewBox="0 0 24 24"><path d="M3 10V6l2-3h14l2 3v4M3 10a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M4 13v8h16v-8M9 21v-6h6v6M9 3v7M15 3v7"/></symbol>
+  <symbol id="sliders" viewBox="0 0 24 24"><path d="M4 3v5m0 4v9M12 3v10m0 4v4M20 3v2m0 4v12M1 8h6v4H1zM9 13h6v4H9zM17 5h6v4h-6z"/></symbol>
+  <symbol id="headset" viewBox="0 0 24 24"><path d="M3 14v-2a9 9 0 0 1 18 0v2M3 12h3v7H3a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1ZM21 12h-3v7h3a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1ZM20 19a3 3 0 0 1-3 3h-5"/></symbol>
+  <symbol id="message" viewBox="0 0 24 24"><path d="M21 11a8 8 0 0 1-8 8H8l-5 3V11a9 9 0 0 1 18 0ZM7 9h10M7 13h6"/></symbol>
+  <symbol id="box" viewBox="0 0 24 24"><path d="m12 2 9 5v10l-9 5-9-5V7l9-5ZM3 7l9 5 9-5M12 12v10M7.5 4.5l9 5v5"/></symbol>
+  <symbol id="person" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></symbol>
+  <symbol id="compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m16 8-2.5 5.5L8 16l2.5-5.5L16 8Z"/></symbol>
+  <symbol id="agreement" viewBox="0 0 24 24"><path d="M14 2H5v20h14V7l-5-5ZM14 2v5h5M8 11h4M8 16l3 3 5-6"/></symbol>
+  <symbol id="code" viewBox="0 0 24 24"><path d="m7 6-6 6 6 6M17 6l6 6-6 6M14 3l-4 18"/></symbol>
+  <symbol id="megaphone" viewBox="0 0 24 24"><path d="m3 9 16-6v18L3 15V9ZM7 16l2 6h4l-2-5M3 9H1v6h2M22 9v6"/></symbol>
+  <symbol id="wallet" viewBox="0 0 24 24"><path d="M20 8V4H5a3 3 0 0 0 0 6h16v11H5a3 3 0 0 1-3-3V7M21 13h-5v5h5M17 15.5h1"/></symbol>
+  <symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></symbol>
+  <symbol id="link" viewBox="0 0 24 24"><path d="m10 14 4-4M8 16l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0M16 8l1-1a4 4 0 0 1 6 6l-5 5a4 4 0 0 1-6 0" transform="translate(1 0) scale(.92 1)"/></symbol>
+</svg>

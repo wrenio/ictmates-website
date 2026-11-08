@@ -19,10 +19,15 @@ const turnstileKey = import.meta.env.DEV ? '' : (import.meta.env.PUBLIC_TURNSTIL
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <div class="announcement">Your technology partner in Pakistan <span>·</span> Home of Webstore.pk</div>
-    <header class="header wrap">
-      <a class="logo" href="/" aria-label="ICT Mates home"><img src="/ictmates-logo.png" alt="ICT Mates" width="1000" height="333" /></a>
-      <nav aria-label="Main navigation"><a href="/">Home</a><a href="/#features">Webstore.pk</a><a href="/#services">Services</a><a href="/partners/">Partners</a><a href="/#about">About us</a></nav>
-      <a class="button small" href="#contact-enquiry">Send an enquiry ↓</a>
+    <header class="site-header">
+      <div class="header wrap">
+        <a class="logo" href="/" aria-label="ICT Mates home"><img src="/ictmates-logo.png" alt="ICT Mates" width="1000" height="333" /></a>
+        <button class="menu-toggle" type="button" aria-controls="header-menu" aria-expanded="false">Menu</button>
+        <div class="header-menu" id="header-menu">
+          <nav aria-label="Main navigation"><a href="/">Home</a><a href="/#features">Webstore.pk</a><a href="/#services">Services</a><a href="/partners/">Partners</a><a href="/#about">About us</a></nav>
+          <a class="button small" href="#contact-enquiry">Send an enquiry ↓</a>
+        </div>
+      </div>
     </header>
     <main id="main" class="contact-page">
       <section class="contact wrap" aria-labelledby="contact-title">
@@ -77,6 +82,7 @@ const turnstileKey = import.meta.env.DEV ? '' : (import.meta.env.PUBLIC_TURNSTIL
         });
       }
     </script>
+    <script src="../scripts/active-navigation.ts"></script>
   </body>
 </html>
 <style>

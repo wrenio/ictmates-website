@@ -33,10 +33,15 @@ const faqs = [
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <div class="announcement">Partner with ICT Mates <span>·</span> Reseller and affiliate opportunities</div>
-    <header class="header wrap">
-      <a class="logo" href="/" aria-label="ICT Mates home"><img src="/ictmates-logo.png" alt="ICT Mates" width="1000" height="333" /></a>
-      <nav aria-label="Main navigation"><a href="/">Home</a><a href="/#features">Webstore.pk</a><a href="/#services">Services</a><a href="/partners/" aria-current="page">Partners</a><a href="#faq">FAQs</a></nav>
-      <a class="button small" href="#partner-contact">Let’s talk ↗︎</a>
+    <header class="site-header">
+      <div class="header wrap">
+        <a class="logo" href="/" aria-label="ICT Mates home"><img src="/ictmates-logo.png" alt="ICT Mates" width="1000" height="333" /></a>
+        <button class="menu-toggle" type="button" aria-controls="header-menu" aria-expanded="false">Menu</button>
+        <div class="header-menu" id="header-menu">
+          <nav aria-label="Main navigation"><a href="/">Home</a><a href="/#features">Webstore.pk</a><a href="/#services">Services</a><a href="/partners/" aria-current="page">Partners</a><a href="#faq">FAQs</a></nav>
+          <a class="button small" href="#partner-contact">Let’s talk ↗︎</a>
+        </div>
+      </div>
     </header>
     <main id="main">
       <section class="hero wrap partner-hero">
@@ -184,6 +189,7 @@ const faqs = [
         });
       }
     </script>
+    <script src="../scripts/active-navigation.ts"></script>
   </body>
 </html>
 <style>

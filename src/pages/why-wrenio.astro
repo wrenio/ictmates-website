@@ -22,10 +22,15 @@ const whatsapp = 'https://wa.me/923005551575?text=Hello%20ICT%20Mates%2C%20I%27d
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <div class="announcement">Webstore.pk by ICT Mates <span>·</span> Powered by Wrenio Commerce</div>
-    <header class="header wrap">
-      <a class="logo" href="/" aria-label="ICT Mates home"><img src="/ictmates-logo.png" alt="ICT Mates" width="1000" height="333" /></a>
-      <nav aria-label="Main navigation"><a href="/">Home</a><a href="/#features">Webstore.pk</a><a href="#comparison">Compare costs</a><a href="/#pricing">Pricing</a><a href="/partners/">Partners</a><a href="/#about">About us</a></nav>
-      <a class="button small" href="#talk">Let’s talk ↗</a>
+    <header class="site-header">
+      <div class="header wrap">
+        <a class="logo" href="/" aria-label="ICT Mates home"><img src="/ictmates-logo.png" alt="ICT Mates" width="1000" height="333" /></a>
+        <button class="menu-toggle" type="button" aria-controls="header-menu" aria-expanded="false">Menu</button>
+        <div class="header-menu" id="header-menu">
+          <nav aria-label="Main navigation"><a href="/">Home</a><a href="/#features">Webstore.pk</a><a href="#comparison">Compare costs</a><a href="/#pricing">Pricing</a><a href="/partners/">Partners</a><a href="/#about">About us</a></nav>
+          <a class="button small" href="#talk">Let’s talk ↗</a>
+        </div>
+      </div>
     </header>
     <main id="main">
       <section class="compare-hero wrap">
@@ -52,6 +57,7 @@ const whatsapp = 'https://wa.me/923005551575?text=Hello%20ICT%20Mates%2C%20I%27d
       <section class="sources wrap"><h2>Pricing sources</h2><p>Comparison researched on 19 October 2026. Providers may change prices and terms. Check the current offers and features before purchasing.</p><ul><li><a href="https://www.shopify.com/pk/pricing" target="_blank" rel="noopener noreferrer">Shopify Pakistan pricing ↗</a></li><li><a href="https://woocommerce.com/pricing/" target="_blank" rel="noopener noreferrer">WooCommerce pricing and cost guidance ↗</a></li><li><a href="https://www.hosterpk.com/wordpress-hosting-pakistan" target="_blank" rel="noopener noreferrer">HosterPK WordPress hosting example ↗</a></li></ul></section>
     </main>
     <footer class="wrap footer"><a class="logo" href="/"><img src="/ictmates-logo.png" alt="ICT Mates" width="1000" height="333" loading="lazy" /></a><p>Technology for your next chapter.</p><nav aria-label="Footer navigation"><a href="/">Home</a><a href="/#pricing">Pricing</a><a href="/why-wrenio/" aria-current="page">Compare webshops</a><a href="/partners/">Partners</a><a href="/contact/">Contact</a></nav><div class="footer-bottom"><span>© {new Date().getFullYear()} ICT Mates. All rights reserved.</span><span>Webstore.pk · A service by ICT Mates</span></div></footer>
+    <script src="../scripts/active-navigation.ts"></script>
   </body>
 </html>
 <style>

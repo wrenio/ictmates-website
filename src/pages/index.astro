@@ -35,12 +35,17 @@ const faqs = [
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <div class="announcement">Your technology partner in Pakistan <span>·</span> Home of Webstore.pk <a href="https://webstore.pk/" target="_blank" rel="noopener noreferrer">Explore our core product ↗︎</a></div>
-    <header class="header wrap">
-      <a class="logo" href="#" aria-label="ICT Mates home"><img src="/ictmates-logo.png" alt="ICT Mates" width="1000" height="333" /></a>
-      <nav aria-label="Main navigation">
-        <a href="#features">Webstore.pk</a><a href="#services">Services</a><a href="#pricing">Webshop plans</a><a href="/partners/">Partners</a><a href="#about">About us</a>
-      </nav>
-      <a class="button small" href="/contact/">Let’s talk <span aria-hidden="true">↗︎</span></a>
+    <header class="site-header">
+      <div class="header wrap">
+        <a class="logo" href="#" aria-label="ICT Mates home"><img src="/ictmates-logo.png" alt="ICT Mates" width="1000" height="333" /></a>
+        <button class="menu-toggle" type="button" aria-controls="header-menu" aria-expanded="false">Menu</button>
+        <div class="header-menu" id="header-menu">
+          <nav aria-label="Main navigation">
+            <a href="#features">Webstore.pk</a><a href="#services">Services</a><a href="#pricing">Webshop plans</a><a href="/partners/">Partners</a><a href="#about">About us</a>
+          </nav>
+          <a class="button small" href="/contact/">Let’s talk <span aria-hidden="true">↗︎</span></a>
+        </div>
+      </div>
     </header>
     <main id="main">
       <section class="hero wrap" id="webshops">
@@ -112,5 +117,6 @@ const faqs = [
         });
       });
     </script>
+    <script src="../scripts/active-navigation.ts"></script>
   </body>
 </html>

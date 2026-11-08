@@ -41,12 +41,17 @@ const faqs = [
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <div class="announcement">Made for businesses in Pakistan <span>·</span> Pay yearly and get two months free <a href="#pricing">See plans ↗︎</a></div>
-    <header class="header wrap">
-      <a class="logo" href="#" aria-label="Webstore.pk home"><img src="/webstore-logo.webp" alt="Webstore.pk" width="600" height="132" /></a>
-      <nav aria-label="Main navigation">
-        <a href="#features">Your store</a><a href="#how-it-works">How it works</a><a href="#pricing">Pricing</a><a href="/partners/">Partners</a><a href="/login/">Store login</a>
-      </nav>
-      <a class="button small" href="#contact">Get started <span aria-hidden="true">↗︎</span></a>
+    <header class="site-header">
+      <div class="header wrap">
+        <a class="logo" href="#" aria-label="Webstore.pk home"><img src="/webstore-logo.webp" alt="Webstore.pk" width="600" height="132" /></a>
+        <button class="menu-toggle" type="button" aria-controls="header-menu" aria-expanded="false">Menu</button>
+        <div class="header-menu" id="header-menu">
+          <nav aria-label="Main navigation">
+            <a href="#features">Your store</a><a href="#how-it-works">How it works</a><a href="#pricing">Pricing</a><a href="/partners/">Partners</a><a href="/login/">Store login</a>
+          </nav>
+          <a class="button small" href="#contact">Get started <span aria-hidden="true">↗︎</span></a>
+        </div>
+      </div>
     </header>
     <main id="main">
       <section class="hero wrap" id="webshops">
@@ -193,6 +198,7 @@ const faqs = [
         });
       }
     </script>
+    <script src="../scripts/active-navigation.ts"></script>
   </body>
 </html>
 <style>

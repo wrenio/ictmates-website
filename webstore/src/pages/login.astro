@@ -2,6 +2,7 @@
 import GoogleTagManager from '../components/GoogleTagManager.astro';
 import '../styles/global.css';
 import '../styles/webstore.css';
+const signInUrl = 'https://manage.webstore.pk/login';
 ---
 <!doctype html>
 <html lang="en">
@@ -10,7 +11,8 @@ import '../styles/webstore.css';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="description" content="Get help accessing your Webstore.pk store admin panel from ICT Mates." />
+    <meta name="description" content="Sign in to manage your Webstore.pk store." />
+    <meta http-equiv="refresh" content={`0; url=${signInUrl}`} />
     <title>Store login | Webstore.pk</title>
     <link rel="canonical" href="https://webstore.pk/login/" />
     <link rel="icon" type="image/png" href="/favicon.png" />
@@ -28,9 +30,8 @@ import '../styles/webstore.css';
     <main class="wrap login-main" id="main">
       <div class="eyebrow">FOR STORE OWNERS</div>
       <h1>Your store.<br /><em>Your admin panel.</em></h1>
-      <p>Manage your products and orders using the admin link provided by ICT Mates when your store is set up.</p>
-      <div class="login-panel"><h2>Already have a store?</h2><p>Open the admin link shared with you by our team. If you need help finding it, contact ICT Mates with your store name.</p><div class="actions"><a class="button" href="https://wa.me/923005551575?text=Hello%20ICT%20Mates%2C%20I%20need%20help%20finding%20my%20Webstore.pk%20admin%20link." target="_blank" rel="noopener noreferrer">Help me access my store ↗︎</a></div></div>
-      <p class="preview-note"><strong>Store access:</strong> each store has its own admin link. Use the link provided by ICT Mates, or ask our team for help.</p>
+      <p>Sign in to manage your products and orders.</p>
+      <div class="login-panel"><h2>Already have a store?</h2><div class="actions"><a class="button" href={signInUrl}>Sign in to your store</a><a class="button" href="https://wa.me/923005551575?text=Hello%20ICT%20Mates%2C%20I%20need%20help%20finding%20my%20Webstore.pk%20admin%20link." target="_blank" rel="noopener noreferrer">Help me access my store ↗︎</a></div></div>
       <p>Looking to start a store? <a class="text-link" href="/#pricing">Explore the plans →</a></p>
     </main>
     <footer class="wrap footer"><p>Webstore.pk · A service by <a href="https://ictmates.com/" target="_blank" rel="noopener noreferrer">ICT Mates ↗︎</a></p><div class="footer-bottom"><span>© {new Date().getFullYear()} Webstore.pk</span><span>Powered by <a href="https://wreniocommerce.com/" target="_blank" rel="noopener noreferrer">Wrenio Commerce</a></span></div></footer>

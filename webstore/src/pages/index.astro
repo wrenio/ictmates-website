@@ -1,5 +1,6 @@
 ---
 import GoogleTagManager from '../components/GoogleTagManager.astro';
+import SocialShareMeta from '../components/SocialShareMeta.astro';
 import '../styles/global.css';
 import '../styles/webstore.css';
 const turnstileKey = (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '').trim();
@@ -39,6 +40,7 @@ const faqs = [
     <meta property="og:description" content="A managed webshop for Pakistan with built-in AI help, SEO and GEO optimization, hosting and local support. From Rs. 3,000/month. Powered by Wrenio Commerce." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://webstore.pk/" />
+    <SocialShareMeta />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>

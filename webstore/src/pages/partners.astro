@@ -1,5 +1,6 @@
 ---
 import GoogleTagManager from '../components/GoogleTagManager.astro';
+import SocialShareMeta from '../components/SocialShareMeta.astro';
 import '../styles/global.css';
 import '../styles/webstore.css';
 const turnstileKey = (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '').trim();
@@ -31,6 +32,7 @@ const faqs = [
     <link rel="canonical" href="https://webstore.pk/partners/" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="theme-color" content="#101b8e" />
+    <SocialShareMeta />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
